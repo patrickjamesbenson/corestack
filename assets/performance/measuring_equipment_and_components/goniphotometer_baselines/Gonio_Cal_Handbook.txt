@@ -1,0 +1,53 @@
+Goniophotometer + Spectro Calibration — Engineering Handbook (Short)
+
+Purpose
+- Maintain a traceable, stable photometric + spectral measurement chain for Type-A/Type-C gonio workflows.
+- Keep photometry (cd/flux) and colour (spectrum → CRI/TM‑30) corrections separate but time‑aligned.
+
+Outcome
+- Apply small, explicit corrections (angle offsets, linearity, scale, SMCF) to raw readings.
+- Apply spectroradiometer corrections (wavelength shift, responsivity) inside the spectral pipeline.
+- Record uncertainty contributors and verification intervals; keep reports + uncertainty budgets on file.
+
+Governance & References
+- ISO/IEC 17025 QMS; NATA optical metrology annex for equipment checks and intervals.
+- Methods: LM‑79 (SSL photometry), CIE S 025 (photometry of lamps/luminaires), LM‑75 (gonio verification).
+
+What Engineers Do (quick steps)
+1) Before test: verify standard lamp setup, distance, power stability; record temp/RH.
+2) Angle zero: check C‑plane and gamma zero/accuracy; enter ΔC, Δγ in spreadsheet.
+3) Photometer chain: use LINEARITY_TABLE and K_cd; confirm dead‑angle OK (flux standard if used).
+4) Source mismatch: choose SMCF row by source type/CCT if required; otherwise baseline = 1.000.
+5) Spectro chain (if used): load wavelength shift/bandpass/resp. file; compute CCT, D_uv, CRI/TM‑30 from corrected spectrum.
+6) Process run: compute I_cd per angle, apply corrections in order → integrate for luminous flux; store run ID, corrections, uncertainty.
+7) Post‑test: log lamp hours; update next_due; archive raw + corrected data and metadata snapshot.
+
+Calibration & Drift Strategy
+- Build a local test rig (stable lamp + fixture) and characterise at a NATA‑accredited lab (traceable report).
+- Use that rig as your frequent in‑house check. Every 6–12 months re‑run the rig on the gonio:
+  • If drift ≈ 0 within uncertainty → keep current factors.
+  • If drift trends appear → re‑evaluate K_cd and angle zeros; update entries and uncertainty.
+- Keep separate records for photometer and spectro corrections to maintain traceability.
+
+Intervals (typical starting point; adjust per usage)
+- Full external calibration: 12 months.
+- Intermediate in‑house checks (angle/linearity/filter): 6 months.
+- Lamp stability check: monthly when in regular use.
+
+Data Fields (see Excel 1‑sheet template)
+- METADATA: lab, report_id, traceability, env., last_test, next_due.
+- ANGLE_OFFSETS: ΔC, Δγ (with uncertainties).
+- PHOTOMETRIC SCALE: K_cd, optional K_flux, distance, dead‑angle flag.
+- LINEARITY_TABLE: piecewise multipliers vs nominal reading.
+- SMCF_VLAMBDA: per source/CCT mismatch factors (or 1.000 baseline).
+- SPECTRO_CAL: wavelength shift, bandpass, stray‑light index, responsivity file.
+- UNCERTAINTY_BUDGET: components with example % contributions.
+- CHECK_LAMPS_LOG: IDs, hours, stability notes.
+- EXAMPLE_CALCULATION: shows the correction order and integrated flux note.
+
+Notes
+- Keep angle offsets explicit (don’t bake into raw). 
+- Document any mirror/stray‑light findings; usually handled in uncertainty, not per‑angle multipliers.
+- If you change detectors or optics, re‑characterise K_cd, linearity, and SMCF.
+
+— End —

@@ -1,0 +1,23 @@
+your_app_root/
+├─ app.py
+├─ utils/
+│  ├─ novon_loader.py          # sibling-first loader + reload()
+│  └─ state_keys.py            # centralised session keys
+├─ services/
+│  ├─ ies_repo.py              # repo readers (find records by luminaire/attributes)
+│  ├─ ies_norm.py              # ***IES normalise/standardise/merge (this is new)***
+│  ├─ outputs_engine.py        # reverse-output math (scene multipliers for lm/W/CCT)
+│  ├─ segment_engine.py        # snap-to-grid + ancillaries (manual builder)
+│  └─ batch_builder.py         # plan exports (IES/datasheet/BOM) – stub now
+├─ pages/
+│  ├─ 00_DB_Builder_Run.py     # run CLI; then reload workflow.json
+│  ├─ 10_Select_Luminaire_Attributes.py
+│  ├─ 20_IES_Lookup_Normalise.py  # ***lookup repo + normalise to standard grid***
+│  ├─ 30_Outputs_and_Scenes.py # sliders/presets; supports up+down; creates MERGED_IES
+│  ├─ 40_Segmentise_Lengths.py # manual builder – adds rows to length table
+│  ├─ 50_Length_Table_Review.py# confirm/lock length table
+│  └─ 60_Batch_Build.py        # stub (later: generate files)
+└─ novon_db_updater/
+   └─ assets/
+      ├─ novon_workflow.json   # canonical workflow
+      └─ ies_repo.json         # ***canonical IES repo written by IES Builder***

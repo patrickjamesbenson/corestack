@@ -1,0 +1,14 @@
+db_builder_entrypoint: "tools/db_builder_run.py"
+select_luminaire_ui: "Select_Luminaire_Attributes/app_ui_full.py"
+ies_lookup_or_norm_ui: "ies_norm/app.py"
+outputs_and_scenes_ui: "Ouputs_and_Scenes/app_config_solver_json_scenes.py"
+segment_ui: "Segment_UI/segment_batch_ui.py"
+
+# SINGLE SOURCE OF TRUTH
+db_assets_dir: "novon_db_update_and_build/assets"
+workflow_json: "novon_db_update_and_build/assets/workflow/current/novon_workflow.json"
+ies_repo_json: "novon_db_update_and_build/assets/ies/repo/current/ies_repo.json"
+db_source_csv_url: "https://docs.google.com/spreadsheets/d/1tvu_RGbwBb62dj8GqDnCoS1fJPmx8AaGA66VsVcyqvw/edit"
+db_source_gsheet_id: "1tvu_RGbwBb62dj8GqDnCoS1fJPmx8AaGA66VsVcyqvw"
+db_source_worksheet: "ALL"
+db_service_account_json: "(ignored; use env/secrets)"

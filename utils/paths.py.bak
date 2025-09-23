@@ -1,0 +1,264 @@
+# ================================
+# file: utils/paths.py
+# ================================
+from __future__ import annotations
+from pathlib import Path
+from typing import Dict, Any
+
+def _naive_yaml_load(txt: str) -> Dict[str, Any]:
+    data: Dict[str, Any] = {}
+    for raw in txt.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or ":" not in line:
+            continue
+        k, v = line.split(":", 1)
+        data[k.strip()] = v.strip().strip('"').strip("'")
+    return data
+
+def load_manifest(app_root: Path) -> Dict[str, Any]:
+    p = app_root / "manifest.yml"
+    if not p.exists():
+        return {}
+    try:
+        import yaml  # optional
+        return (yaml.safe_load(p.read_text(encoding="utf-8")) or {})
+    except Exception:
+        return _naive_yaml_load(p.read_text(encoding="utf-8", errors="ignore"))
+
+def get_assets_root(app_root: Path) -> Path:
+    mf = load_manifest(app_root)
+    rel = mf.get("db_assets_dir", "novon_db_update_and_build/assets")
+    return (app_root / "legacy_src" / rel).resolve()
+
+def workflow_current_path(app_root: Path) -> Path:
+    mf = load_manifest(app_root)
+    rel = mf.get(
+        "workflow_json",
+        "novon_db_update_and_build/assets/workflow/current/novon_workflow.json",
+    )
+    return (app_root / "legacy_src" / rel).resolve()
+
+def workflow_history_dir(app_root: Path) -> Path:
+    return get_assets_root(app_root) / "workflow" / "history"
+
+def ies_repo_current_path(app_root: Path) -> Path:
+    mf = load_manifest(app_root)
+    rel = mf.get(
+        "ies_repo_json",
+        "novon_db_update_and_build/assets/ies/repo/current/ies_repo.json",
+    )
+    return (app_root / "legacy_src" / rel).resolve()
+
+def ensure_assets_tree(app_root: Path) -> Dict[str, Path]:
+    root = get_assets_root(app_root)
+    paths = {
+        "root": root,
+        "wf_current": root / "workflow" / "current" / "novon_workflow.json",
+        "wf_history": root / "workflow" / "history",
+        "ies_repo_current": root / "ies" / "repo" / "current" / "ies_repo.json",
+        "ies_repo_history": root / "ies" / "repo" / "history",
+        "ies_originals": root / "ies" / "originals",
+        "ies_built": root / "ies" / "built",
+    }
+    for p in paths.values():
+        if p.suffix:  # file
+            p.parent.mkdir(parents=True, exist_ok=True)
+        else:
+            p.mkdir(parents=True, exist_ok=True)
+    return paths
+
+# ================================
+# file: utils/changelog.py
+# ================================
+from __future__ import annotations
+from typing import Any, Dict, List, Tuple
+
+def _is_scalar(v: Any) -> bool:
+    return isinstance(v, (str, int, float, bool)) or v is None
+
+def _flatten(d: Any, prefix: str = "") -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
+    if isinstance(d, dict):
+        for k, v in d.items():
+            out.update(_flatten(v, f"{prefix}.{k}" if prefix else str(k)))
+    elif isinstance(d, list):
+        for i, v in enumerate(d):
+            out.update(_flatten(v, f"{prefix}[{i}]"))
+    else:
+        out[prefix] = d
+    return out
+
+def diff_dicts(old: Dict[str, Any], new: Dict[str, Any]) -> Tuple[List[str], List[Tuple[str, Any, Any]], List[str]]:
+    f_old = _flatten(old)
+    f_new = _flatten(new)
+    adds: List[str] = []
+    changes: List[Tuple[str, Any, Any]] = []
+    dels: List[str] = []
+    for k in f_new:
+        if k not in f_old:
+            adds.append(k)
+        else:
+            if f_old[k] != f_new[k]:
+                changes.append((k, f_old[k], f_new[k]))
+    for k in f_old:
+        if k not in f_new:
+            dels.append(k)
+    return adds, changes, dels
+
+def render_changelog_md(build_id: str, adds: List[str], changes: List[Tuple[str, Any, Any]], dels: List[str]) -> str:
+    lines = []
+    lines.append(f"# NOVON DB Changelog — {build_id}")
+    lines.append("")
+    if changes:
+        lines.append("## ❌ Changes")
+        for k, a, b in changes:
+            lines.append(f"- **{k}**: `{a}` → `{b}`")
+        lines.append("")
+    if adds:
+        lines.append("## ✅ Additions")
+        for k in adds:
+            lines.append(f"- {k}")
+        lines.append("")
+    if dels:
+        lines.append("## ⚠️ Deletions")
+        for k in dels:
+            lines.append(f"- {k}")
+        lines.append("")
+    if not (adds or changes or dels):
+        lines.append("_No differences; structure unchanged._")
+    return "\n".join(lines) + "\n"
+
+# ================================
+# file: utils/builder.py
+# ================================
+from __future__ import annotations
+import json, hashlib, csv
+from pathlib import Path
+from typing import Any, Dict, Tuple
+from utils.paths import ensure_assets_tree
+from utils.changelog import diff_dicts, render_changelog_md
+
+def _hash_obj(obj: Dict[str, Any]) -> str:
+    b = json.dumps(obj, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    return hashlib.sha256(b).hexdigest()[:8]
+
+def _timestamp() -> str:
+    import datetime as _dt
+    return _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+
+def _read_json(p: Path) -> Dict[str, Any]:
+    return json.loads(p.read_text(encoding="utf-8"))
+
+def _maybe_read_json(p: Path) -> Dict[str, Any]:
+    return _read_json(p) if p.exists() else {}
+
+def _read_csv_to_json(p: Path) -> Dict[str, Any]:
+    # Very simple CSV→JSON: first column becomes key; remainder as dict
+    rows = []
+    with p.open("r", encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        for r in reader:
+            rows.append({k: (v if v != "" else None) for k, v in r.items()})
+    return {"rows": rows, "meta": {"source": str(p)}}
+
+def _load_source(source: str) -> Dict[str, Any]:
+    # Accept: .json, .csv; for Google Sheets, use File > Download > CSV and pass the file path here.
+    p = Path(source)
+    if not p.exists():
+        raise FileNotFoundError(f"Source not found: {p}")
+    if p.suffix.lower() == ".json":
+        return _read_json(p)
+    if p.suffix.lower() == ".csv":
+        return _read_csv_to_json(p)
+    raise ValueError(f"Unsupported source type: {p.suffix}")
+
+def build_database(app_root: Path, source: str) -> Tuple[Path, Path, Path, str]:
+    """Returns (current_json, history_json, changelog_md, build_id)."""
+    tree = ensure_assets_tree(app_root)
+    current = tree["wf_current"]
+    history_dir = tree["wf_history"]
+
+    new_obj = _load_source(source)
+
+    # Attach build metadata (non-breaking additive)
+    ts = _timestamp()
+    content_hash = _hash_obj(new_obj)
+    build_id = f"{ts}__{content_hash}"
+    meta = new_obj.get("meta", {})
+    meta.update({"build_id": build_id, "built_at": ts})
+    new_obj["meta"] = meta
+
+    old_obj = _maybe_read_json(current)
+
+    adds, changes, dels = diff_dicts(old_obj, new_obj)
+    changelog = render_changelog_md(build_id, adds, changes, dels)
+
+    # Write atomically
+    hist_json = history_dir / f"{build_id}.json"
+    hist_md   = history_dir / f"{build_id}__changelog.md"
+    hist_json.write_text(json.dumps(new_obj, indent=2, ensure_ascii=False), encoding="utf-8")
+    hist_md.write_text(changelog, encoding="utf-8")
+    current.parent.mkdir(parents=True, exist_ok=True)
+    current.write_text(json.dumps(new_obj, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    return current, hist_json, hist_md, build_id
+
+# ================================
+# file: utils/sidebar_pill.py
+# ================================
+from __future__ import annotations
+from pathlib import Path
+import datetime as dt
+import streamlit as st
+
+def _stamp(p: Path) -> str:
+    try:
+        return dt.datetime.fromtimestamp(p.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
+    except Exception:
+        return "?"
+
+def render_sanity_pills(workflow_path: Path, ies_repo_path: Path | None = None) -> None:
+    """Call at end of each page after legacy UI executes."""
+    if workflow_path and workflow_path.exists():
+        st.sidebar.success(f"WF ✓ {workflow_path.name} — {_stamp(workflow_path)}")
+    else:
+        st.sidebar.error("WF ✗ not found")
+
+    if ies_repo_path is not None:
+        if ies_repo_path.exists():
+            st.sidebar.info(f"IES repo ✓ {ies_repo_path.name} — {_stamp(ies_repo_path)}")
+        else:
+            st.sidebar.warning("IES repo: build/refresh to create")
+
+# ================================
+# file: tools/db_builder_run.py
+# ================================
+from __future__ import annotations
+import argparse
+from pathlib import Path
+from utils.builder import build_database
+
+def main():
+    ap = argparse.ArgumentParser(description="NOVON DB Builder (JSON/CSV → workflow)")
+    ap.add_argument("--source", required=True, help="Path to source .json or .csv (export Google Sheet as CSV)")
+    args = ap.parse_args()
+    app_root = Path(__file__).resolve().parents[1]
+    current, hist_json, hist_md, build_id = build_database(app_root, args.source)
+    print("[OK] DB built")
+    print(f"  build_id      : {build_id}")
+    print(f"  current JSON  : {current}")
+    print(f"  history JSON  : {hist_json}")
+    print(f"  changelog MD  : {hist_md}")
+
+if __name__ == "__main__":
+    main()
+
+# ================================
+# OPTIONAL: how to call the pills in your wrappers (snippet)
+# (Add this near the end of each wrapper, after exec(...))
+# ================================
+# from pathlib import Path
+# from utils.paths import workflow_current_path, ies_repo_current_path
+# from utils.sidebar_pill import render_sanity_pills
+# APP_ROOT = Path(__file__).resolve().parents[1]
+# render_sanity_pills(workflow_current_path(APP_ROOT), ies_repo_current_path(APP_ROOT))
