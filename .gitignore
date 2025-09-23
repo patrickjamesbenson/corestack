@@ -1,13 +1,8 @@
-# python
 __pycache__/
 *.pyc
 .venv*/
-
-# logs & generated
 assets/logs/
 assets/db/history/
-
-# secrets
 assets/keys/
 legacy_src/**/service_account.json
 *.key.json
