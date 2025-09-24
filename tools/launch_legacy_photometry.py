@@ -1,4 +1,4 @@
-# tools/launch_legacy_photometry.py
+﻿# tools/launch_legacy_photometry.py
 from __future__ import annotations
 import json, os, sys, subprocess, webbrowser
 from pathlib import Path
@@ -45,3 +45,4 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 import json, hashlib, csv
 from pathlib import Path
 from typing import Any, Dict, Tuple
@@ -66,3 +66,4 @@ def build_database(app_root: Path, source: str) -> Tuple[Path, Path, Path, str]:
     (current.parent / "latest.txt").write_text(build_id, encoding="utf-8")
 
     return current, hist_json, hist_md, build_id
+

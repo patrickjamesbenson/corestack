@@ -1,43 +1,24 @@
-﻿# -*- coding: utf-8 -*-
+﻿# utils/photometry_engine_adapter.py
+# -*- coding: utf-8 -*-
 from __future__ import annotations
-
 from typing import Any, Dict, List, Tuple, Optional
 from math import isfinite, exp
-from pathlib import Path
-from datetime import datetime
-import json
-import re
-
 import numpy as np
 
 
-# ============================================================
-# Parsing LM-63 (robust against BOMs, CRLFs, blank lines)
-# ============================================================
+# ----------------------------- Parsing -----------------------------
 
 def parse_ies(data: bytes) -> Dict[str, Any]:
-    """
-    Parse a minimal LM-63 IES photometry into a working payload:
-      {
-        "meta": { "header": str, "keywords_order": [{"key": str, "value": str}, ...] },
-        "tilt": { "mode": "TILT=..." },
-        "geometry": {"G0":..., "G1":..., ..., "G14": ... },
-        "photometry": { "v_angles": [...], "h_angles": [...], "candela": [[...], ...] }
-      }
-    """
     txt = data.decode("utf-8", errors="ignore")
-    # normalise line endings, kill BOM if present
-    txt = txt.replace("\r\n", "\n").replace("\r", "\n")
-    txt = txt.lstrip("\ufeff")
+    txt = txt.replace("\r\n", "\n").replace("\r", "\n").strip("\")
     raw_lines = [ln.rstrip() for ln in txt.split("\n")]
-    # keep non-empty
     lines = [ln for ln in raw_lines if ln.strip()]
 
     if not lines or not lines[0].upper().startswith("IESNA"):
         raise ValueError("Missing IESNA header")
     header = lines[0]
 
-    # keywords until TILT
+    # keywords until TILT=...
     i = 1
     keywords: List[Tuple[str, str]] = []
     tilt_mode = None
@@ -52,8 +33,7 @@ def parse_ies(data: bytes) -> Dict[str, Any]:
             v = ln[ln.index("]") + 1 :].strip()
             keywords.append((k, v))
         else:
-            # preserve raw keyword-ish lines (old files)
-            keywords.append((ln, ""))
+            keywords.append((ln, ""))  # keep raw line
         i += 1
     if tilt_mode is None:
         raise ValueError("TILT line not found")
@@ -73,10 +53,8 @@ def parse_ies(data: bytes) -> Dict[str, Any]:
     if len(tokens) < 10:
         raise ValueError("Not enough numbers for geometry (G0..G9)")
 
-    # G0..G9
     G: Dict[str, float] = {}
-    g0_9 = tokens[:10]
-    pos = 10
+    g0_9 = tokens[:10]; pos = 10
     for idx, val in enumerate(g0_9):
         G[f"G{idx}"] = float(val)
 
@@ -86,37 +64,26 @@ def parse_ies(data: bytes) -> Dict[str, Any]:
         raise ValueError(f"Invalid V/H counts (V={v_count}, H={h_count})")
 
     need_rest = v_count + h_count + v_count * h_count
-
-    # Some files include G10..G14 (0..5 extras). Detect by matching remaining length.
     best_ex: Optional[int] = None
     for ex in range(0, 6):
         remain = len(tokens) - (pos + ex)
         if remain == need_rest:
-            best_ex = ex
-            break
+            best_ex = ex; break
     if best_ex is None:
         for ex in range(0, 6):
             remain = len(tokens) - (pos + ex)
             if remain >= need_rest:
-                best_ex = ex
-                break
+                best_ex = ex; break
     if best_ex is None:
         raise ValueError("Insufficient angle/candela values")
 
     ex = best_ex
-    extras = tokens[pos : pos + ex]
-    pos += ex
-    if ex >= 1:
-        G["G10"] = float(extras[0])  # ballast factor
-    if ex >= 2:
-        G["G11"] = float(extras[1])  # file generation type (we may mirror the flags string here)
-    if ex >= 3:
-        G["G12"] = float(extras[2])  # input/system watts
-    if ex >= 4:
-        G["G13"] = float(extras[3])  # raw board lumens
-    if ex >= 5:
-        G["G14"] = float(extras[4])  # circuit watts
-
+    extras = tokens[pos:pos+ex]; pos += ex
+    if ex >= 1: G["G10"] = float(extras[0])  # ballast factor
+    if ex >= 2: G["G11"] = float(extras[1])  # file generation type (numeric in old files; we’ll mirror flags later)
+    if ex >= 3: G["G12"] = float(extras[2])  # input watts
+    if ex >= 4: G["G13"] = float(extras[3])  # raw board lumens
+    if ex >= 5: G["G14"] = float(extras[4])  # circuit watts
     for k in range(0, 15):
         G.setdefault(f"G{k}", 0.0)
 
@@ -127,11 +94,9 @@ def parse_ies(data: bytes) -> Dict[str, Any]:
         have = len(tokens) - pos
         raise ValueError(f"Insufficient angle/candela values (need {need_rest}, have {have})")
 
-    V = [float(x) for x in tokens[pos:end_v]]
-    pos = end_v
-    H = [float(x) for x in tokens[pos:end_h]]
-    pos = end_h
-    flat_I = [float(x) for x in tokens[pos:end_I]]
+    V = [float(x) for x in tokens[pos:end_v]]; pos = end_v
+    H = [float(x) for x in tokens[pos:end_h]]; pos = end_h
+    flat_I  = [float(x) for x in tokens[pos:end_I]]; pos = end_I
     I = np.asarray(flat_I, dtype=float).reshape(h_count, v_count)
 
     meta = {"header": header, "keywords_order": [{"key": k, "value": v} for k, v in keywords]}
@@ -142,10 +107,6 @@ def parse_ies(data: bytes) -> Dict[str, Any]:
         "photometry": {"v_angles": V, "h_angles": H, "candela": I.tolist()},
     }
 
-
-# ============================================================
-# Metadata / Geometry helpers
-# ============================================================
 
 def ordered_metadata_rows(parsed: Dict[str, Any]) -> List[Tuple[str, Any]]:
     meta = parsed.get("meta") or {}
@@ -175,9 +136,7 @@ def geometry_rows_ordered(parsed: Dict[str, Any]) -> List[Tuple[str, str, Any]]:
     return [(f"G{n}", key, g.get(key)) for (n, key, _v) in items]
 
 
-# ============================================================
-# Photometry maths
-# ============================================================
+# ----------------------------- Photometry maths -----------------------------
 
 def luminous_flux_with_note(parsed: Dict[str, Any]) -> Tuple[Optional[float], str]:
     ph = parsed.get("photometry") or {}
@@ -196,7 +155,6 @@ def luminous_flux_with_note(parsed: Dict[str, Any]) -> Tuple[Optional[float], st
     Phi = np.trapz(dPhi_dH, Hrad)
 
     note = ""
-    # Doubling for half-azimuth coverage (<=180°)
     if len(H) > 0 and float(np.max(H)) <= 180.0:
         Phi *= 2.0
         note = "half-azimuth → symmetry ×2"
@@ -232,12 +190,6 @@ def _lerp_x(x0: float, x1: float, y0: float, y1: float, y: float) -> float:
 
 
 def beam_angle_with_note(parsed: Dict[str, Any]) -> Tuple[Optional[float], str]:
-    """
-    BA for symmetric Type-C-like beams:
-      pick H-plane with max peak;
-      find first θ in 0→90 where intensity = 50% peak; BA = 2×θ;
-      fallbacks: 10%, 1/e²; else 0.
-    """
     ph = parsed.get("photometry") or {}
     V = np.array(ph.get("v_angles") or [], dtype=float)
     H = np.array(ph.get("h_angles") or [], dtype=float)
@@ -264,15 +216,15 @@ def beam_angle_with_note(parsed: Dict[str, Any]) -> Tuple[Optional[float], str]:
         idx = np.where(np.diff(np.signbit(dif)))[0]
         if idx.size:
             k = int(idx[0])
-            return _lerp_x(vv[k], vv[k + 1], ss[k], ss[k + 1], tgt)
+            return _lerp_x(vv[k], vv[k+1], ss[k], ss[k+1], tgt)
         # fine grid fallback
-        vv_f = np.linspace(vv[0], vv[-1], max(3, int((vv[-1] - vv[0]) * 20) + 1))
+        vv_f = np.linspace(vv[0], vv[-1], max(3, int((vv[-1]-vv[0])*20)+1))
         ss_f = np.interp(vv_f, vv, ss)
         dif_f = ss_f - tgt
         idx_f = np.where(np.diff(np.signbit(dif_f)))[0]
         if idx_f.size:
             k = int(idx_f[0])
-            return _lerp_x(vv_f[k], vv_f[k + 1], ss_f[k], ss_f[k + 1], tgt)
+            return _lerp_x(vv_f[k], vv_f[k+1], ss_f[k], ss_f[k+1], tgt)
         return None
 
     for frac, label in ((0.5, "2×θ@50%"), (0.1, "2×θ@10%"), (exp(-2), "2×θ@1/e²")):
@@ -283,9 +235,7 @@ def beam_angle_with_note(parsed: Dict[str, Any]) -> Tuple[Optional[float], str]:
     return 0.0, "flat"
 
 
-# ============================================================
-# Flags & geometry edit
-# ============================================================
+# ----------------------------- Flags & geometry -----------------------------
 
 def pack_flags(flags: Tuple[bool, bool, bool, bool, bool]) -> str:
     return ".".join("1" if b else "0" for b in flags)
@@ -294,7 +244,7 @@ def pack_flags(flags: Tuple[bool, bool, bool, bool, bool]) -> str:
 def apply_geometry(working: Dict[str, Any], g_new: Dict[str, Any]) -> Dict[str, Any]:
     out = dict(working)
     geom = dict(out.get("geometry", {}))
-    for k in ("G7", "G8", "G9", "G10", "G11", "G12", "G13", "G14", "file_generation_flags"):
+    for k in ("G7","G8","G9","G10","G11","G12","G13","G14","file_generation_flags"):
         if k in g_new:
             geom[k] = g_new[k]
     # mirror flags into G11 as a string like "1.1.1.0.0"
@@ -304,9 +254,7 @@ def apply_geometry(working: Dict[str, Any], g_new: Dict[str, Any]) -> Dict[str, 
     return out
 
 
-# ============================================================
-# Interpolation / Resample (+ zero beyond 90° after all ops)
-# ============================================================
+# ----------------------------- Interpolation -----------------------------
 
 def source_is_0_to_90(working: Dict[str, Any]) -> bool:
     ph = working.get("photometry") or {}
@@ -319,20 +267,16 @@ def source_is_0_to_90(working: Dict[str, Any]) -> bool:
 
 
 def resample_photometry(
-    V: List[float],
-    H: List[float],
-    I: np.ndarray,
-    target_v: int,
-    target_h: int,
+    V: List[float], H: List[float], I: np.ndarray,
+    target_v: int, target_h: int,
     force_zero_beyond_90: bool,
-    flip_vertical: bool,
+    flip_vertical: bool
 ) -> Tuple[List[float], List[float], np.ndarray]:
     """
     Resample to target counts (linear interp). After resample and optional flip,
     enforce zeros for all V>90° when force_zero_beyond_90 is True.
     """
-    V = np.array(V, dtype=float)
-    H = np.array(H, dtype=float)
+    V = np.array(V, dtype=float); H = np.array(H, dtype=float)
     I = np.array(I, dtype=float)
     if I.ndim != 2 or I.shape != (len(H), len(V)):
         raise ValueError("I shape mismatch")
@@ -357,7 +301,6 @@ def resample_photometry(
         mask = Vt > 90.0 + 1e-9
         if np.any(mask):
             Ivh[:, mask] = 0.0
-            # also zero the first index > 90 explicitly (to avoid tiny residuals)
             k_first = int(np.argmax(mask))
             if 0 <= k_first < Ivh.shape[1]:
                 Ivh[:, k_first] = 0.0
@@ -365,20 +308,18 @@ def resample_photometry(
     return list(Vt), list(Ht), Ivh
 
 
-# ============================================================
-# Derived metadata rows from PHOTOM_LAYOUT
-# ============================================================
+# ----------------------------- Metadata build -----------------------------
 
 def build_metadata_from_photom_layout(
-    working: Dict[str, Any], db_json: Optional[Dict[str, Any]]
+    working: Dict[str, Any],
+    db_json: Optional[Dict[str, Any]]
 ) -> List[Dict[str, Any]]:
     """
-    Returns list of rows: {FIELD, IES_FUNC, ORIGINAL, EDIT_HERE, INTERPOLATED}
-    EDIT_HERE is editable only if IES_FUNC == 'Editable'. Deriveds filled from calculations.
+    Returns a list of rows: {FIELD, IES_FUNC, ORIGINAL, EDIT_HERE, INTERPOLATED}
+    EDIT_HERE is editable only if IES_FUNC == 'Editable'. Derived are filled from calculations.
     """
     rows: List[Dict[str, Any]] = []
-
-    # original keyword map
+    # baseline: raw ordered keywords
     original_map = {}
     for k, v in ordered_metadata_rows(working):
         original_map[str(k).strip()] = v
@@ -392,15 +333,15 @@ def build_metadata_from_photom_layout(
     # quick calcs
     lm, _note = luminous_flux_with_note(working)
     lm = float(lm or 0.0)
-    length_m = float(geom.get("G8", 0.0)) / 1000.0 if float(geom.get("G8", 0.0) or 0.0) > 0 else 0.0
-    circuit_w = float(geom.get("G14", 0.0) or 0.0)
-    input_w = float(geom.get("G12", 0.0) or 0.0)
-    raw_lm = float(geom.get("G13", 0.0) or 0.0)
+    length_m = float(geom.get("G8", 0.0)) / 1000.0
+    circuit_w = float(geom.get("G14", 0.0))
+    input_w = float(geom.get("G12", 0.0))
+    raw_lm = float(geom.get("G13", 0.0))
     lm_per_w = (lm / input_w) if input_w > 0 else 0.0
     lm_per_m = (lm / length_m) if length_m > 0 else 0.0
     opt_eff = (lm / raw_lm) * 100.0 if raw_lm > 0 else 0.0
 
-    # PHOTOM_LAYOUT from DB JSON
+    # db_json → PHOTOM_LAYOUT
     table = (db_json or {}).get("PHOTOM_LAYOUT") or []
 
     def _is_derived(func: str) -> bool:
@@ -420,7 +361,7 @@ def build_metadata_from_photom_layout(
         orig_val = original_map.get(field, "")
         interp_val = proposed
 
-        # common deriveds
+        # hardwired derived examples
         if field == "IESNA: LM-63-2019":
             interp_val = "IESNA: LM-63-2019"
         elif field == "[_LUMINOUS_FLUX_REF]":
@@ -438,26 +379,20 @@ def build_metadata_from_photom_layout(
         elif field == "[_LENGTH_M]":
             interp_val = f"{length_m:.4f}"
 
-        rows.append(
-            {
-                "FIELD": field,
-                "IES_FUNC": func,
-                "ORIGINAL": orig_val,
-                "EDIT_HERE": "" if _is_derived(func) else (orig_val if orig_val else ""),
-                "INTERPOLATED": interp_val,
-            }
-        )
+        rows.append({
+            "FIELD": field,
+            "IES_FUNC": func,
+            "ORIGINAL": orig_val,
+            "EDIT_HERE": "" if _is_derived(func) else (orig_val if orig_val else ""),
+            "INTERPOLATED": interp_val,
+        })
     return rows
 
 
-# ============================================================
-# Export (LM-63 text builder, JSON repo writer)
-# ============================================================
+# ----------------------------- Export helpers -----------------------------
 
 def export_ies_lm63(working: Dict[str, Any], meta_rows: List[Dict[str, Any]]) -> str:
-    """
-    Build an LM-63 text from working + edited meta rows.
-    """
+    """Build a minimal LM-63 text based on current working and meta rows."""
     geom = working.get("geometry", {}) or {}
     ph = working.get("photometry", {}) or {}
     V = ph.get("v_angles") or []
@@ -466,23 +401,22 @@ def export_ies_lm63(working: Dict[str, Any], meta_rows: List[Dict[str, Any]]) ->
 
     # header & keywords
     lines = ["IESNA:LM-63-2019"]
+    # write keywords from edited rows (ORIGINAL + EDIT_HERE/INTERPOLATED)
     for r in meta_rows:
         k = r.get("FIELD", "")
-        if not k or str(k).upper().startswith("IESNA"):
+        if not k or k.upper().startswith("IESNA"):
             continue
         v = r.get("EDIT_HERE") or r.get("INTERPOLATED") or r.get("ORIGINAL") or ""
-        # keep bracketed keys like "[TEST]" without extra spaces
-        if str(k).startswith("["):
-            lines.append(f"{k}{v}")
+        if not str(k).startswith("["):
+            lines.append(f"{k}{v if v else ''}")
         else:
-            # raw line from old files; keep single space between
-            lines.append(f"{k} {v}".rstrip())
+            lines.append(f"{k}{v}")
 
-    # TILT
     lines.append("TILT=NONE")
 
-    # geometry (G0..G12 numeric). G11 may be flags string → output 0.0 in numeric block.
+    # geometry block (G0..G12) — keep numeric
     gnums = [geom.get(f"G{k}", 0.0) for k in range(0, 13)]
+    # G11 may be a flags string; LM-63 numeric block expects a number → write 0.0 for that position
     try:
         _ = float(geom.get("G11"))
     except Exception:
@@ -493,173 +427,12 @@ def export_ies_lm63(working: Dict[str, Any], meta_rows: List[Dict[str, Any]]) ->
     lines.append(" ".join(str(float(x)) for x in V))
     lines.append(" ".join(str(float(x)) for x in H))
     flat = I.reshape(-1)
-    # write intensities with reasonable chunking
-    chunk = 12
-    for i in range(0, len(flat), chunk):
-        lines.append(" ".join(str(float(x)) for x in flat[i : i + chunk]))
+    lines.append(" ".join(str(float(x)) for x in flat))
 
     return "\n".join(lines) + "\n"
 
 
-# ---------- Zonal split & simple metadata injection ----------
-
-def zonal_flux_split(payload: Dict[str, Any]) -> Tuple[float, float]:
-    ph = payload.get("photometry") or {}
-    V = np.asarray(ph.get("v_angles") or [], dtype=float)
-    H = np.asarray(ph.get("h_angles") or [], dtype=float)
-    I = np.asarray(ph.get("candela") or [], dtype=float)
-    if I.ndim != 2 or I.shape != (len(H), len(V)):
-        return 0.0, 0.0
-    v_rad = np.deg2rad(V)
-    line = I * np.sin(v_rad)[None, :]
-    # Down = 0..90, Up = 90..180 (clip by available range)
-    lo = np.where(V <= 90)[0]
-    hi = np.where(V >= 90)[0]
-
-    def _trapz_rows(rows_idx):
-        if rows_idx.size == 0:
-            return 0.0
-        dPhi_dH = np.trapz(line[:, rows_idx], v_rad[rows_idx], axis=1)
-        full = 2.0 if (len(H) and H[-1] <= 180.0) else 1.0
-        return float(np.trapz(dPhi_dH, np.deg2rad(H)) * full)
-
-    return _trapz_rows(lo), _trapz_rows(hi)
-
-
-def inject_calculated_metadata(payload: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Minimal safe stub – keep structure, optionally add derived labels if you like.
-    """
-    return dict(payload)
-
-
-# ---------- Naming helpers ----------
-
-def _slug(s: str) -> str:
-    s = (s or "").strip()
-    s = re.sub(r"\s+", "_", s)
-    s = re.sub(r"[^A-Za-z0-9._-]+", "", s)
-    return s or "unnamed"
-
-
-def _photometric_type_label(geom: Dict[str, Any]) -> str:
-    try:
-        pt = int(float(geom.get("G5", 1)))
-    except Exception:
-        pt = 1
-    return {1: "C", 2: "B", 3: "A"}.get(pt, "C")
-
-
-def _hemi_mode_label(payload: Dict[str, Any]) -> str:
-    try:
-        down, up = zonal_flux_split(payload)
-        tol = 1e-6
-        if down > tol and up > tol:
-            return "B"
-        if up > tol:
-            return "I"
-        return "D"
-    except Exception:
-        return "B"
-
-
-def build_repo_filename(payload: Dict[str, Any], *, prefer_mm: bool = True, ext: str = ".json") -> str:
-    meta = dict(payload.get("metadata", {}) or {})
-    geom = dict(payload.get("geometry", {}) or {})
-    lumcat = meta.get("[LUMCAT]") or meta.get("LUMCAT") or meta.get("[LUMCAT ]") or ""
-    lumcat = _slug(str(lumcat))
-    try:
-        length_mm = float(geom.get("G8", 0.0))
-    except Exception:
-        length_mm = 0.0
-    length_tag = f"{int(round(length_mm))}mm" if prefer_mm else f"{length_mm/1000.0:.3f}m"
-    ptype = _photometric_type_label(geom)
-    hemi = _hemi_mode_label(payload)
-    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    base = "__".join([x for x in (lumcat, length_tag, f"Type{ptype}{hemi}", stamp) if x])
-    name = _slug(base)
-    if not name.endswith(ext):
-        name += ext
-    return name
-
-
-# ---------- LM-63 builder (alt) + file exporters ----------
-
-def build_ies_text(payload: Dict[str, Any]) -> str:
-    """
-    Build LM-63 from payload fields directly (without meta_rows).
-    Useful for quick downloads.
-    """
-    p = inject_calculated_metadata(dict(payload))
-    meta = p.get("meta") or {}
-    header = meta.get("header") or "IESNA:LM-63-2019"
-    rows = meta.get("keywords_order") or []
-    tilt = (p.get("tilt") or {}).get("mode") or "TILT=NONE"
-    g = p.get("geometry") or {}
-    ph = p.get("photometry") or {}
-    V = ph.get("v_angles") or []
-    H = ph.get("h_angles") or []
-    I = ph.get("candela") or []
-
-    lines = [header]
-    for r in rows:
-        k = (r.get("key") or "").strip()
-        v = (r.get("value") or "").strip()
-        if not k:
-            continue
-        if k.startswith("["):
-            lines.append(f"{k}{v}")
-        else:
-            lines.append(f"{k} {v}".rstrip())
-    lines.append(tilt)
-
-    # geometry G0..G12 numeric; zero out G11 if it’s flags text
-    gnums = [g.get(f"G{k}", 0.0) for k in range(0, 13)]
-    try:
-        _ = float(g.get("G11"))
-    except Exception:
-        gnums[11] = 0.0
-    lines.append(" ".join(str(float(x)) for x in gnums))
-
-    lines.append(" ".join(str(float(x)) for x in V))
-    lines.append(" ".join(str(float(x)) for x in H))
-
-    # Candela flatten
-    if isinstance(I, list) and I and isinstance(I[0], list):
-        flat = [float(x) for row in I for x in row]
-    else:
-        flat = [float(x) for x in (I or [])]
-
-    chunk = 12
-    for i in range(0, len(flat), chunk):
-        lines.append(" ".join(str(float(x)) for x in flat[i : i + chunk]))
-
-    return "\n".join(lines) + "\n"
-
-
-def export_repo_json(payload: Dict[str, Any], folder: Path) -> Path:
-    folder = Path(folder)
-    folder.mkdir(parents=True, exist_ok=True)
-    name = build_repo_filename(payload, ext=".json")
-    outp = folder / name
-    pkg = inject_calculated_metadata(dict(payload))
-    outp.write_text(json.dumps(pkg, ensure_ascii=False, indent=2), encoding="utf-8")
-    return outp
-
-
-def export_files_lm63(payload: Dict[str, Any], folder: Path) -> Path:
-    folder = Path(folder)
-    folder.mkdir(parents=True, exist_ok=True)
-    name = build_repo_filename(payload, ext=".ies")
-    txt = build_ies_text(inject_calculated_metadata(dict(payload)))
-    outp = folder / name
-    outp.write_text(txt, encoding="utf-8", newline="\n")
-    return outp
-
-
-# ============================================================
-# Scaling (canonical 1 mm, or arbitrary)
-# ============================================================
+# ----------------------------- Scaling -----------------------------
 
 def scale_working_length_and_flux(working: Dict[str, Any], target_length_mm: float) -> Dict[str, Any]:
     """
@@ -676,14 +449,15 @@ def scale_working_length_and_flux(working: Dict[str, Any], target_length_mm: flo
     H = list(ph.get("h_angles") or [])
     I = np.array(ph.get("candela") or [], dtype=float)
 
-    cur_len = float(geom.get("G8", 0.0) or 0.0)
+    cur_len = float(geom.get("G8", 0.0))
     if cur_len <= 0 or target_length_mm <= 0:
         return out
 
     k = float(target_length_mm) / float(cur_len)
 
     # scale geometry figures
-    geom["G8"] = float(geom.get("G8", 0.0)) * k
+    for gk in ("G8",):
+        geom[gk] = float(geom.get(gk, 0.0)) * k
     for gk in ("G12", "G14", "G13"):
         geom[gk] = float(geom.get(gk, 0.0)) * k
 
@@ -696,13 +470,3 @@ def scale_working_length_and_flux(working: Dict[str, Any], target_length_mm: flo
     out["photometry"] = ph
     return out
 
-
-# convenience alias requested earlier
-def scale_to_length_mm(payload: Dict[str, Any], target_length_mm: float,
-                       *,
-                       scale_candela: bool = True,
-                       scale_input_watts: bool = True,
-                       scale_circuit_watts: bool = True,
-                       scale_raw_lumens: bool = True) -> Dict[str, Any]:
-    # This alias keeps the signature you liked; internally reuses the core scaler.
-    return scale_working_length_and_flux(payload, target_length_mm)

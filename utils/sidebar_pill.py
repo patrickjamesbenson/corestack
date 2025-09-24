@@ -1,4 +1,4 @@
-# utils/sidebar_pill.py
+﻿# utils/sidebar_pill.py
 from __future__ import annotations
 from pathlib import Path
 from datetime import datetime
@@ -75,3 +75,4 @@ def render_sanity_pills(*args, **kwargs) -> None:
     if wf: wf_pill(Path(wf))
     if repo: repo_pill(Path(repo))
     if prov: provenance_pill(Path(prov))
+

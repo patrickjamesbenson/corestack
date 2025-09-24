@@ -1,10 +1,16 @@
+﻿# Python / Streamlit cache
 __pycache__/
 *.pyc
-.venv*/
-assets/logs/
-assets/db/history/
-assets/keys/
-legacy_src/**/service_account.json
-*.key.json
-*.service_account.json
+.streamlit/
+
+# Virtual env / local env files
+.venv/
 .env
+
+# Local-only data (keep private)
+assets/keys/
+assets/ies_repo/
+assets/baselines/
+
+# Optional: ignore ref-data JSON if you prefer to generate from Sheets
+assets/db/*.json

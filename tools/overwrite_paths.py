@@ -1,4 +1,4 @@
-# tools/overwrite_paths.py
+﻿# tools/overwrite_paths.py
 from __future__ import annotations
 from pathlib import Path
 
@@ -41,3 +41,4 @@ def ensure_assets_tree(root: Path | None = None) -> None:
 
 TARGET.write_text(CONTENT, encoding="utf-8")
 print(f"[OK] Wrote {TARGET}")
+

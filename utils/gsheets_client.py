@@ -1,4 +1,4 @@
-# utils/gsheets_pull.py
+﻿# utils/gsheets_pull.py
 from __future__ import annotations
 from typing import Dict, Any
 from google.oauth2.service_account import Credentials
@@ -21,3 +21,4 @@ def pull_all_sheets(sheet_id: str, _unused=None) -> Dict[str, Any]:
         resp = svc.values().get(spreadsheetId=sheet_id, range=t).execute()
         out[t] = resp.get("values", [])
     return out
+

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 from typing import Any, Dict, List, Tuple
 
 def _flatten(d: Any, prefix: str = "") -> Dict[str, Any]:
@@ -47,3 +47,4 @@ def render_changelog_md(build_id: str, adds: list[str], changes: list[tuple[str,
     if not (adds or changes or dels):
         lines.append("_No differences; structure unchanged._")
     return "\n".join(lines) + "\n"
+

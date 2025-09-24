@@ -1,0 +1,523 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linear LED Luminaire Photometric Testing Protocol — Flattened</title>
+<style>
+:root{--fg:#222;--bg:#fff;--muted:#666;--rule:#e5e7eb;--pill:#1a73e81a;--acc:#1a73e8}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif}
+main{max-width:980px;margin:22px auto;padding:0 16px 56px}
+h1,h2,h3{line-height:1.2;margin:0 0 .6em}
+h1{font-size:1.7rem} h2{font-size:1.25rem} h3{font-size:1.05rem}
+p{margin:.6em 0} small,.muted{color:var(--muted)}
+header{padding:20px 16px;border-bottom:1px solid var(--rule);background:#fafafa}
+header .wrap{max-width:980px;margin:0 auto}
+nav.pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}
+nav.pills a{display:inline-block;padding:.35rem .7rem;border:1px solid var(--rule);border-radius:999px;text-decoration:none;color:#0b57d0;background:var(--pill)}
+nav.pills a:hover{background:#e8f0fe}
+section{padding:16px 0;border-bottom:1px dashed var(--rule)}
+ul{margin:.4em 0 .8em 1.1em} li{margin:.2em 0}
+.table{overflow:auto;border:1px solid var(--rule);border-radius:6px}
+.table table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:.5em .6em;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+.figure{border:1px solid var(--rule);border-radius:8px;padding:10px;margin:.6rem 0;background:#fff}
+.caption{color:var(--muted);font-size:.9em;margin-top:.3rem}
+.badge{display:inline-block;background:#eef6ff;border:1px solid #dbeafe;border-radius:.4rem;padding:.1rem .4rem}
+footer{color:var(--muted);font-size:.9em;padding-top:8px}
+svg{max-width:100%;height:auto;display:block}
+</style>
+</head><body>
+<header><div class="wrap">
+  <h1>Linear LED Luminaire Photometric Testing Protocol</h1>
+  <div class="muted">Flattened single-file web doc. Quick, lightweight, and linkable. Generated 2025-09-24.</div>
+  <nav class="pills">
+    <a href="#summary">Summary</a>
+    <a href="#problem">Problem</a>
+    <a href="#solution">Solution</a>
+    <a href="#specs">Specs</a>
+    <a href="#diagrams">Diagrams</a>
+  </nav>
+</div></header>
+<main>
+<section id="summary"><h2>Executive Summary</h2><p>Novon Lighting's advanced <span class="technical-term">Boundary-Compensated Linear Testing (BCLT)</span> methodology eliminates <span class="technical-term">Linear Terminal Interference Effect (LTIE)</span> in photometric measurements. Our proprietary <span class="technical-term">Centered Array Photometric Protocol (CAPP)</span> combined with advanced <span class="technical-term">Photometric Dimensional Reduction Protocol (PDRP)</span> and <span class="technical-term">Adaptive Hemisphere Detection Algorithm (AHDA)</span> tests a 560mm LED sample (equivalent to our standard LED board length) within a 1200mm test fixture. This ensures the test sample behaves exactly like a proper continuous section of linear lighting without end plate interference, providing accurate luminous flux data that represents real-world performance in continuous linear installations of any length.</p></section><section id="problem"><h2>⚠️ Challenge: Linear Terminal Interference Effect (LTIE)</h2><p>Traditional photometric testing of linear LED luminaires places LEDs along the full length of test fixtures. However, when LEDs are positioned near end plates, their hemispherical light emission is absorbed and incorrectly reflected by these solid boundaries, resulting in artificially reduced luminous flux measurements that do not represent the performance of LEDs in proper continuous installations.</p></section><section id="solution"><h2>✅ Solution: Boundary-Compensated Linear Testing (BCLT)</h2><p>Novon Lighting's proprietary <strong>Centered Array Photometric Protocol (CAPP)</strong> tests a precisely 560mm LED sample within a 1200mm test luminaire. This 560mm test sample corresponds exactly to our standard LED board length and represents a proper continuous section of linear lighting without end plate interference. The larger 1200mm test fixture provides 320mm buffer zones from each end plate, ensuring the 560mm test sample performs identically to how it would in a proper continuous installation.</p></section>
+<section id="specs"><h2>Key Test Parameters</h2>
+<div class="table"><table>
+<thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+<tbody><tr><td>Test Luminaire Dimensions</td><td><b>1200mm</b></td></tr>
+<tr><td>Test Sample Length</td><td><b>560mm</b></td></tr>
+<tr><td>End Plate Clearance</td><td><b>320mm each end</b></td></tr>
+<tr><td>LED Pitch</td><td><b>Pitch varies</b></td></tr>
+<tr><td>LTIE Elimination</td><td><b>>99% effective</b></td></tr>
+<tr><td>Scalability Range</td><td><b>Any length</b></td></tr></tbody>
+</table></div>
+</section>
+<section id="diagrams"><h2>Diagrams</h2><div class="figure"><svg width="100%" height="200" viewBox="0 0 1000 200">
+                        <!-- Housing -->
+                        <rect x="75" y="60" width="850" height="80" class="housing" rx="5"/>
+                        
+                        <!-- End plates -->
+                        <rect x="75" y="50" width="15" height="100" class="end-plate"/>
+                        <rect x="910" y="50" width="15" height="100" class="end-plate"/>
+                        
+                        <!-- LED Board -->
+                        <rect x="95" y="95" width="810" height="10" class="led-board"/>
+                        
+                        <!-- LEDs along full length -->
+                        <g class="leds">
+                            <!-- LEDs near left end -->
+                            <circle cx="105" cy="100" r="3" class="led"/>
+                            <circle cx="125" cy="100" r="3" class="led"/>
+                            <circle cx="145" cy="100" r="3" class="led"/>
+                            
+                            <!-- Middle LEDs -->
+                            <circle cx="250" cy="100" r="3" class="led"/>
+                            <circle cx="300" cy="100" r="3" class="led"/>
+                            <circle cx="350" cy="100" r="3" class="led"/>
+                            <circle cx="400" cy="100" r="3" class="led"/>
+                            <circle cx="450" cy="100" r="3" class="led"/>
+                            <circle cx="500" cy="100" r="3" class="led"/>
+                            <circle cx="550" cy="100" r="3" class="led"/>
+                            <circle cx="600" cy="100" r="3" class="led"/>
+                            <circle cx="650" cy="100" r="3" class="led"/>
+                            <circle cx="700" cy="100" r="3" class="led"/>
+                            <circle cx="750" cy="100" r="3" class="led"/>
+                            <circle cx="800" cy="100" r="3" class="led"/>
+                            
+                            <!-- LEDs near right end -->
+                            <circle cx="845" cy="100" r="3" class="led"/>
+                            <circle cx="865" cy="100" r="3" class="led"/>
+                            <circle cx="885" cy="100" r="3" class="led"/>
+                        </g>
+                        
+                        <!-- Diffuser -->
+                        <rect x="75" y="50" width="850" height="5" class="diffuser" rx="2"/>
+                        
+                        <!-- Light rays showing interference -->
+                        <!-- Left end interference -->
+                        <path d="M 105 100 L 70 80" class="light-ray"/>
+                        <path d="M 70 80 L 110 85" class="light-ray-reflected"/>
+                        <path d="M 105 100 L 70 120" class="light-ray"/>
+                        <path d="M 70 120 L 110 115" class="light-ray-reflected"/>
+                        
+                        <path d="M 125 100 L 80 75" class="light-ray"/>
+                        <path d="M 80 75 L 130 85" class="light-ray-reflected"/>
+                        
+                        <!-- Right end interference -->
+                        <path d="M 885 100 L 930 80" class="light-ray"/>
+                        <path d="M 930 80 L 880 85" class="light-ray-reflected"/>
+                        <path d="M 885 100 L 930 120" class="light-ray"/>
+                        <path d="M 930 120 L 880 115" class="light-ray-reflected"/>
+                        
+                        <path d="M 865 100 L 920 125" class="light-ray"/>
+                        <path d="M 920 125 L 860 115" class="light-ray-reflected"/>
+                        
+                        <!-- Free rays from center -->
+                        <path d="M 500 100 L 480 40" class="light-ray-free"/>
+                        <path d="M 500 100 L 520 40" class="light-ray-free"/>
+                        <path d="M 500 100 L 480 160" class="light-ray-free"/>
+                        <path d="M 500 100 L 520 160" class="light-ray-free"/>
+                        
+                        <!-- Dimensions and labels -->
+                        <text x="500" y="25" class="dimensions" text-anchor="middle" font-weight="bold">1200mm Luminaire Length</text>
+                        <text x="500" y="185" class="dimensions" text-anchor="middle">⚠️ LTIE Effect: End plate absorption/reflection misrepresents edge LED output by 8-12%</text>
+                        
+                        <!-- Warning indicators -->
+                        <circle cx="105" cy="100" r="8" fill="none" stroke="#e74c3c" stroke-width="2" stroke-dasharray="2,1"/>
+                        <circle cx="125" cy="100" r="8" fill="none" stroke="#e74c3c" stroke-width="2" stroke-dasharray="2,1"/>
+                        <circle cx="885" cy="100" r="8" fill="none" stroke="#e74c3c" stroke-width="2" stroke-dasharray="2,1"/>
+                        <circle cx="865" cy="100" r="8" fill="none" stroke="#e74c3c" stroke-width="2" stroke-dasharray="2,1"/>
+                        
+                        <text x="82" y="170" class="dimensions" text-anchor="middle" font-size="10px" fill="#e74c3c">LTIE Zone</text>
+                        <text x="875" y="170" class="dimensions" text-anchor="middle" font-size="10px" fill="#e74c3c">LTIE Zone</text>
+                    </svg><div class="caption">Traditional Testing Method - LTIE Present</div></div><div class="figure"><svg width="100%" height="200" viewBox="0 0 1000 200">
+                        <!-- Housing -->
+                        <rect x="75" y="60" width="850" height="80" class="housing" rx="5"/>
+                        
+                        <!-- End plates -->
+                        <rect x="75" y="50" width="15" height="100" class="end-plate"/>
+                        <rect x="910" y="50" width="15" height="100" class="end-plate"/>
+                        
+                        <!-- LED Board (full length but only center populated) -->
+                        <rect x="95" y="95" width="810" height="10" class="led-board"/>
+                        
+                        <!-- LEDs only in center 560mm -->
+                        <g class="leds">
+                            <circle cx="315" cy="100" r="3" class="led"/>
+                            <circle cx="335" cy="100" r="3" class="led"/>
+                            <circle cx="355" cy="100" r="3" class="led"/>
+                            <circle cx="375" cy="100" r="3" class="led"/>
+                            <circle cx="395" cy="100" r="3" class="led"/>
+                            <circle cx="415" cy="100" r="3" class="led"/>
+                            <circle cx="435" cy="100" r="3" class="led"/>
+                            <circle cx="455" cy="100" r="3" class="led"/>
+                            <circle cx="475" cy="100" r="3" class="led"/>
+                            <circle cx="495" cy="100" r="3" class="led"/>
+                            <circle cx="515" cy="100" r="3" class="led"/>
+                            <circle cx="535" cy="100" r="3" class="led"/>
+                            <circle cx="555" cy="100" r="3" class="led"/>
+                            <circle cx="575" cy="100" r="3" class="led"/>
+                            <circle cx="595" cy="100" r="3" class="led"/>
+                            <circle cx="615" cy="100" r="3" class="led"/>
+                            <circle cx="635" cy="100" r="3" class="led"/>
+                            <circle cx="655" cy="100" r="3" class="led"/>
+                            <circle cx="675" cy="100" r="3" class="led"/>
+                            <circle cx="695" cy="100" r="3" class="led"/>
+                            <circle cx="715" cy="100" r="3" class="led"/>
+                            <circle cx="735" cy="100" r="3" class="led"/>
+                            <circle cx="755" cy="100" r="3" class="led"/>
+                            <circle cx="775" cy="100" r="3" class="led"/>
+                        </g>
+                        
+                        <!-- Diffuser -->
+                        <rect x="75" y="50" width="850" height="5" class="diffuser" rx="2"/>
+                        
+                        <!-- Light rays showing free emission -->
+                        <path d="M 315 100 L 295 40" class="light-ray-free"/>
+                        <path d="M 315 100 L 335 40" class="light-ray-free"/>
+                        <path d="M 315 100 L 295 160" class="light-ray-free"/>
+                        <path d="M 315 100 L 335 160" class="light-ray-free"/>
+                        
+                        <path d="M 500 100 L 480 40" class="light-ray-free"/>
+                        <path d="M 500 100 L 520 40" class="light-ray-free"/>
+                        <path d="M 500 100 L 480 160" class="light-ray-free"/>
+                        <path d="M 500 100 L 520 160" class="light-ray-free"/>
+                        
+                        <path d="M 675 100 L 655 40" class="light-ray-free"/>
+                        <path d="M 675 100 L 695 40" class="light-ray-free"/>
+                        <path d="M 675 100 L 655 160" class="light-ray-free"/>
+                        <path d="M 675 100 L 695 160" class="light-ray-free"/>
+                        
+                        <!-- Dimension lines and annotations -->
+                        <line x1="315" y1="170" x2="775" y2="170" stroke="#27ae60" stroke-width="2"/>
+                        <text x="545" y="167" class="dimensions" text-anchor="middle" font-weight="bold" fill="#27ae60">560mm Test Sample</text>
+                        
+                        <line x1="95" y1="175" x2="315" y2="175" stroke="#3498db" stroke-width="1" stroke-dasharray="3,2"/>
+                        <text x="205" y="190" class="dimensions" text-anchor="middle" font-size="10px" fill="#3498db">320mm Buffer</text>
+                        
+                        <line x1="775" y1="175" x2="905" y2="175" stroke="#3498db" stroke-width="1" stroke-dasharray="3,2"/>
+                        <text x="840" y="190" class="dimensions" text-anchor="middle" font-size="10px" fill="#3498db">320mm Buffer</text>
+                        
+                        <text x="500" y="25" class="dimensions" text-anchor="middle" font-weight="bold">1200mm Test Luminaire Length</text>
+                        <text x="500" y="185" class="dimensions" text-anchor="middle">✅ LTIE Eliminated: 560mm test sample represents proper continuous lighting without end plates</text>
+                        
+                        <!-- Success indicators -->
+                        <rect x="295" y="45" width="480" height="8" fill="rgba(39,174,96,0.2)" stroke="#27ae60" stroke-width="1" rx="4"/>
+                        <text x="535" y="51" class="dimensions" text-anchor="middle" font-size="10px" fill="#27ae60" font-weight="bold">Proper LTIE-Free Test Zone</text>
+                    </svg><div class="caption">BCLT Method - CAPP Implementation</div></div><div class="figure"><svg width="100%" height="150" viewBox="0 0 500 150">
+                        <!-- Housing cross-section -->
+                        <rect x="210" y="25" width="80" height="80" class="housing" rx="5"/>
+                        
+                        <!-- LED board -->
+                        <rect x="220" y="85" width="60" height="8" class="led-board"/>
+                        
+                        <!-- LEDs -->
+                        <circle cx="235" cy="89" r="2.5" class="led"/>
+                        <circle cx="250" cy="89" r="2.5" class="led"/>
+                        <circle cx="265" cy="89" r="2.5" class="led"/>
+                        
+                        <!-- Diffuser -->
+                        <rect x="210" y="25" width="80" height="4" class="diffuser" rx="2"/>
+                        
+                        <!-- Light rays -->
+                        <path d="M 235 89 L 215 35" class="light-ray-free"/>
+                        <path d="M 235 89 L 255 35" class="light-ray-free"/>
+                        <path d="M 250 89 L 240 35" class="light-ray-free"/>
+                        <path d="M 250 89 L 260 35" class="light-ray-free"/>
+                        <path d="M 265 89 L 245 35" class="light-ray-free"/>
+                        <path d="M 265 89 L 285 35" class="light-ray-free"/>
+                        
+                        <!-- Dimensions -->
+                        <text x="160" y="65" class="dimensions" text-anchor="middle" transform="rotate(-90 160 65)" font-weight="bold">80mm</text>
+                        <text x="250" y="125" class="dimensions" text-anchor="middle" font-weight="bold">80mm</text>
+                        <text x="250" y="140" class="dimensions" text-anchor="middle">Premium Opal/Clear Diffuser</text>
+                        
+                        <text x="350" y="65" class="dimensions" text-anchor="start">Square Profile</text>
+                        <text x="350" y="80" class="dimensions" text-anchor="start">Available: Any length</text>
+                        <text x="350" y="95" class="dimensions" text-anchor="start">LED Pitch: Varies</text>
+                    </svg><div class="caption">Luminaire Cross-Section Profile</div></div><div class="figure"><svg width="100%" height="250" viewBox="0 0 1000 250">
+                        <!-- Step 1: Design -->
+                        <rect x="50" y="40" width="120" height="50" fill="#3498db" stroke="#2980b9" stroke-width="2" rx="5"/>
+                        <text x="110" y="60" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">Design</text>
+                        <text x="110" y="75" class="dimensions" text-anchor="middle" fill="white">Specification</text>
+                        <text x="110" y="110" class="dimensions" text-anchor="middle" font-size="10px">Target Lux Levels</text>
+                        
+                        <!-- Arrow 1 -->
+                        <path d="M 180 65 L 220 65" stroke="#2c3e50" stroke-width="3" fill="none" marker-end="url(#arrowhead2)"/>
+                        <text x="200" y="55" class="dimensions" text-anchor="middle" font-size="10px">Vf Analysis</text>
+                        <text x="200" y="85" class="dimensions" text-anchor="middle" font-size="10px">PDRP Scaling</text>
+                        
+                        <!-- Step 2: Build -->
+                        <rect x="230" y="40" width="120" height="50" fill="#ff6b47" stroke="#e55a3c" stroke-width="2" rx="5"/>
+                        <text x="290" y="60" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">Build</text>
+                        <text x="290" y="75" class="dimensions" text-anchor="middle" fill="white">Optimization</text>
+                        <text x="290" y="110" class="dimensions" text-anchor="middle" font-size="10px">Vf-Validated mA Output</text>
+                        
+                        <!-- Arrow 2 -->
+                        <path d="M 360 65 L 400 65" stroke="#2c3e50" stroke-width="3" fill="none" marker-end="url(#arrowhead2)"/>
+                        <text x="380" y="55" class="dimensions" text-anchor="middle" font-size="10px">Installation</text>
+                        <text x="380" y="85" class="dimensions" text-anchor="middle" font-size="10px">Commissioning</text>
+                        
+                        <!-- Step 3: Install -->
+                        <rect x="410" y="40" width="120" height="50" fill="#27ae60" stroke="#229954" stroke-width="2" rx="5"/>
+                        <text x="470" y="60" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">Site</text>
+                        <text x="470" y="75" class="dimensions" text-anchor="middle" fill="white">Installation</text>
+                        <text x="470" y="110" class="dimensions" text-anchor="middle" font-size="10px">Real-World Performance</text>
+                        
+                        <!-- Arrow 3 -->
+                        <path d="M 540 65 L 580 65" stroke="#2c3e50" stroke-width="3" fill="none" marker-end="url(#arrowhead2)"/>
+                        <text x="560" y="55" class="dimensions" text-anchor="middle" font-size="10px">LuxLog™</text>
+                        <text x="560" y="85" class="dimensions" text-anchor="middle" font-size="10px">Data Collection</text>
+                        
+                        <!-- Step 4: Validation -->
+                        <rect x="590" y="40" width="120" height="50" fill="#9b59b6" stroke="#8e44ad" stroke-width="2" rx="5"/>
+                        <text x="650" y="60" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">Validation</text>
+                        <text x="650" y="75" class="dimensions" text-anchor="middle" fill="white">& Feedback</text>
+                        <text x="650" y="110" class="dimensions" text-anchor="middle" font-size="10px">Performance Analysis</text>
+                        
+                        <!-- Feedback Arrow -->
+                        <path d="M 590 45 Q 320 20 230 45" stroke="#e74c3c" stroke-width="3" fill="none" marker-end="url(#arrowhead2)" stroke-dasharray="5,3"/>
+                        <text x="410" y="15" class="dimensions" text-anchor="middle" font-size="10px" fill="#e74c3c">Continuous Algorithm Refinement</text>
+                        
+                        <!-- Benefits Section -->
+                        <text x="500" y="150" class="dimensions" text-anchor="middle" font-weight="bold" font-size="14px">Advanced Validation Benefits</text>
+                        
+                        <text x="150" y="180" class="dimensions" text-anchor="middle" font-size="11px">• TM-30 multiplier precision</text>
+                        <text x="150" y="195" class="dimensions" text-anchor="middle" font-size="11px">• Target lux optimization</text>
+                        <text x="150" y="210" class="dimensions" text-anchor="middle" font-size="11px">• Design intent preservation</text>
+                        
+                        <text x="350" y="180" class="dimensions" text-anchor="middle" font-size="11px">• Real-time Vf compensation</text>
+                        <text x="350" y="195" class="dimensions" text-anchor="middle" font-size="11px">• Precise mA determination</text>
+                        <text x="350" y="210" class="dimensions" text-anchor="middle" font-size="11px">• Power draw accuracy</text>
+                        
+                        <text x="550" y="180" class="dimensions" text-anchor="middle" font-size="11px">• Post-install validation</text>
+                        <text x="550" y="195" class="dimensions" text-anchor="middle" font-size="11px">• Site lux verification</text>
+                        <text x="550" y="210" class="dimensions" text-anchor="middle" font-size="11px">• CLO tuning support</text>
+                        
+                        <text x="750" y="180" class="dimensions" text-anchor="middle" font-size="11px">• Long-term tracking</text>
+                        <text x="750" y="195" class="dimensions" text-anchor="middle" font-size="11px">• Algorithm refinement</text>
+                        <text x="750" y="210" class="dimensions" text-anchor="middle" font-size="11px">• Continuous improvement</text>
+                        
+                        <!-- Define arrow marker -->
+                        <defs>
+                            <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+                            </marker>
+                        </defs>
+                    </svg><div class="caption">🎯 Live IES Scaling &amp; Vf Validation Engine - Lumi_SpecTrace™ Technology</div></div><div class="figure"><svg width="100%" height="250" viewBox="0 0 1000 250">
+                        <!-- Step 1: Design -->
+                        <rect x="50" y="40" width="120" height="50" fill="#3498db" stroke="#2980b9" stroke-width="2" rx="5"/>
+                        <text x="110" y="60" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">Design</text>
+                        <text x="110" y="75" class="dimensions" text-anchor="middle" fill="white">Specification</text>
+                        <text x="110" y="110" class="dimensions" text-anchor="middle" font-size="10px">Target Lux Levels</text>
+                        
+                        <!-- Arrow 1 -->
+                        <path d="M 180 65 L 220 65" stroke="#2c3e50" stroke-width="3" fill="none" marker-end="url(#arrowhead2)"/>
+                        <text x="200" y="55" class="dimensions" text-anchor="middle" font-size="10px">Vf Analysis</text>
+                        <text x="200" y="85" class="dimensions" text-anchor="middle" font-size="10px">PDRP Scaling</text>
+                        
+                        <!-- Step 2: Build -->
+                        <rect x="230" y="40" width="120" height="50" fill="#ff6b47" stroke="#e55a3c" stroke-width="2" rx="5"/>
+                        <text x="290" y="60" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">Build</text>
+                        <text x="290" y="75" class="dimensions" text-anchor="middle" fill="white">Optimization</text>
+                        <text x="290" y="110" class="dimensions" text-anchor="middle" font-size="10px">Vf-Validated mA Output</text>
+                        
+                        <!-- Arrow 2 -->
+                        <path d="M 360 65 L 400 65" stroke="#2c3e50" stroke-width="3" fill="none" marker-end="url(#arrowhead2)"/>
+                        <text x="380" y="55" class="dimensions" text-anchor="middle" font-size="10px">Installation</text>
+                        <text x="380" y="85" class="dimensions" text-anchor="middle" font-size="10px">Commissioning</text>
+                        
+                        <!-- Step 3: Install -->
+                        <rect x="410" y="40" width="120" height="50" fill="#27ae60" stroke="#229954" stroke-width="2" rx="5"/>
+                        <text x="470" y="60" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">Site</text>
+                        <text x="470" y="75" class="dimensions" text-anchor="middle" fill="white">Installation</text>
+                        <text x="470" y="110" class="dimensions" text-anchor="middle" font-size="10px">Real-World Performance</text>
+                        
+                        <!-- Arrow 3 -->
+                        <path d="M 540 65 L 580 65" stroke="#2c3e50" stroke-width="3" fill="none" marker-end="url(#arrowhead2)"/>
+                        <text x="560" y="55" class="dimensions" text-anchor="middle" font-size="10px">LuxLog™</text>
+                        <text x="560" y="85" class="dimensions" text-anchor="middle" font-size="10px">Data Collection</text>
+                        
+                        <!-- Step 4: Validation -->
+                        <rect x="590" y="40" width="120" height="50" fill="#9b59b6" stroke="#8e44ad" stroke-width="2" rx="5"/>
+                        <text x="650" y="60" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">Validation</text>
+                        <text x="650" y="75" class="dimensions" text-anchor="middle" fill="white">& Feedback</text>
+                        <text x="650" y="110" class="dimensions" text-anchor="middle" font-size="10px">Performance Analysis</text>
+                        
+                        <!-- Feedback Arrow -->
+                        <path d="M 590 45 Q 320 20 230 45" stroke="#e74c3c" stroke-width="3" fill="none" marker-end="url(#arrowhead2)" stroke-dasharray="5,3"/>
+                        <text x="410" y="15" class="dimensions" text-anchor="middle" font-size="10px" fill="#e74c3c">Continuous Algorithm Refinement</text>
+                        
+                        <!-- Benefits Section -->
+                        <text x="500" y="150" class="dimensions" text-anchor="middle" font-weight="bold" font-size="14px">Advanced Validation Benefits</text>
+                        
+                        <text x="150" y="180" class="dimensions" text-anchor="middle" font-size="11px">• TM-30 multiplier precision</text>
+                        <text x="150" y="195" class="dimensions" text-anchor="middle" font-size="11px">• Target lux optimization</text>
+                        <text x="150" y="210" class="dimensions" text-anchor="middle" font-size="11px">• Design intent preservation</text>
+                        
+                        <text x="350" y="180" class="dimensions" text-anchor="middle" font-size="11px">• Real-time Vf compensation</text>
+                        <text x="350" y="195" class="dimensions" text-anchor="middle" font-size="11px">• Precise mA determination</text>
+                        <text x="350" y="210" class="dimensions" text-anchor="middle" font-size="11px">• Power draw accuracy</text>
+                        
+                        <text x="550" y="180" class="dimensions" text-anchor="middle" font-size="11px">• Post-install validation</text>
+                        <text x="550" y="195" class="dimensions" text-anchor="middle" font-size="11px">• Site lux verification</text>
+                        <text x="550" y="210" class="dimensions" text-anchor="middle" font-size="11px">• CLO tuning support</text>
+                        
+                        <text x="750" y="180" class="dimensions" text-anchor="middle" font-size="11px">• Long-term tracking</text>
+                        <text x="750" y="195" class="dimensions" text-anchor="middle" font-size="11px">• Algorithm refinement</text>
+                        <text x="750" y="210" class="dimensions" text-anchor="middle" font-size="11px">• Continuous improvement</text>
+                        
+                        <!-- Define arrow marker -->
+                        <defs>
+                            <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+                            </marker>
+                        </defs>
+                    </svg><div class="caption">🔄 Lumi_SpecTrace™ Validation &amp; Feedback Workflow</div></div><div class="figure"><svg width="100%" height="300" viewBox="0 0 1000 300">
+                        <!-- Step 1: 560mm Test -->
+                        <rect x="50" y="50" width="120" height="60" fill="#ff6b47" stroke="#e55a3c" stroke-width="2" rx="5"/>
+                        <text x="110" y="75" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">560mm</text>
+                        <text x="110" y="90" class="dimensions" text-anchor="middle" fill="white">CAPP Test</text>
+                        <text x="110" y="130" class="dimensions" text-anchor="middle" font-size="10px">Measured IES Data</text>
+                        
+                        <!-- Arrow 1 -->
+                        <path d="M 180 80 L 220 80" stroke="#2c3e50" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+                        <text x="200" y="70" class="dimensions" text-anchor="middle" font-size="10px">PDRP + CLIM</text>
+                        <text x="200" y="100" class="dimensions" text-anchor="middle" font-size="10px">Processing</text>
+                        
+                        <!-- Step 2: 1mm Unit -->
+                        <rect x="230" y="50" width="120" height="60" fill="#27ae60" stroke="#229954" stroke-width="2" rx="5"/>
+                        <text x="290" y="75" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">1mm</text>
+                        <text x="290" y="90" class="dimensions" text-anchor="middle" fill="white">PDRP Unit</text>
+                        <text x="290" y="130" class="dimensions" text-anchor="middle" font-size="10px">Normalized via ANFS</text>
+                        
+                        <!-- Arrow 2 -->
+                        <path d="M 360 80 L 400 80" stroke="#2c3e50" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+                        <text x="380" y="70" class="dimensions" text-anchor="middle" font-size="10px">Linear</text>
+                        <text x="380" y="100" class="dimensions" text-anchor="middle" font-size="10px">Multiplication</text>
+                        
+                        <!-- Step 3: Any Length -->
+                        <rect x="410" y="50" width="120" height="60" fill="#3498db" stroke="#2980b9" stroke-width="2" rx="5"/>
+                        <text x="470" y="75" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">Any Length</text>
+                        <text x="470" y="90" class="dimensions" text-anchor="middle" fill="white">Installation</text>
+                        <text x="470" y="130" class="dimensions" text-anchor="middle" font-size="10px">PDRP-Validated Performance</text>
+                        
+                        <!-- AHDA Hemisphere Processing Box -->
+                        <rect x="600" y="30" width="350" height="120" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2" rx="8"/>
+                        <text x="775" y="50" class="dimensions" text-anchor="middle" font-weight="bold" font-size="12px">AHDA Hemisphere Processing Engine</text>
+                        
+                        <!-- Direct -->
+                        <rect x="620" y="70" width="80" height="25" fill="#e74c3c" stroke="#c0392b" stroke-width="1" rx="3"/>
+                        <text x="660" y="85" class="dimensions" text-anchor="middle" fill="white" font-size="10px">Direct (0-90°)</text>
+                        
+                        <!-- Indirect -->
+                        <rect x="720" y="70" width="80" height="25" fill="#9b59b6" stroke="#8e44ad" stroke-width="1" rx="3"/>
+                        <text x="760" y="85" class="dimensions" text-anchor="middle" fill="white" font-size="10px">Indirect (90-180°)</text>
+                        
+                        <!-- Bidirectional -->
+                        <rect x="820" y="70" width="80" height="25" fill="#f39c12" stroke="#e67e22" stroke-width="1" rx="3"/>
+                        <text x="860" y="85" class="dimensions" text-anchor="middle" fill="white" font-size="10px">Bidirectional</text>
+                        
+                        <text x="775" y="115" class="dimensions" text-anchor="middle" font-size="10px">AHDA auto-detection with ANFS noise tolerance & CLIM flux preservation</text>
+                        <text x="775" y="130" class="dimensions" text-anchor="middle" font-size="10px">Circular-Linear Interpolation Matrix with advanced azimuthal sampling</text>
+                        
+                        <!-- Processing Flow -->
+                        <text x="500" y="200" class="dimensions" text-anchor="middle" font-weight="bold" font-size="14px">Advanced Scaling Engine Technologies</text>
+                        
+                        <text x="150" y="230" class="dimensions" text-anchor="middle" font-size="11px">• BCLT eliminates LTIE</text>
+                        <text x="150" y="245" class="dimensions" text-anchor="middle" font-size="11px">• CAPP methodology</text>
+                        <text x="150" y="260" class="dimensions" text-anchor="middle" font-size="11px">• IES LM-79 compliance</text>
+                        
+                        <text x="350" y="230" class="dimensions" text-anchor="middle" font-size="11px">• PDRP dimensional reduction</text>
+                        <text x="350" y="245" class="dimensions" text-anchor="middle" font-size="11px">• CLIM flux preservation</text>
+                        <text x="350" y="260" class="dimensions" text-anchor="middle" font-size="11px">• ANFS noise suppression</text>
+                        
+                        <text x="550" y="230" class="dimensions" text-anchor="middle" font-size="11px">• Linear scaling accuracy</text>
+                        <text x="550" y="245" class="dimensions" text-anchor="middle" font-size="11px">• Any continuous length</text>
+                        <text x="550" y="260" class="dimensions" text-anchor="middle" font-size="11px">• ±2% variance guarantee</text>
+                        
+                        <text x="800" y="230" class="dimensions" text-anchor="middle" font-size="11px">• AHDA hemisphere detection</text>
+                        <text x="800" y="245" class="dimensions" text-anchor="middle" font-size="11px">• Intelligent mode selection</text>
+                        <text x="800" y="260" class="dimensions" text-anchor="middle" font-size="11px">• Multi-directional capability</text>
+                        
+                        <!-- Define arrow marker -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+                            </marker>
+                        </defs>
+                    </svg><div class="caption">⚙️ Novon Photometric Scaling Engine - Advanced PDRP &amp; AHDA Technology</div></div><div class="figure"><svg width="100%" height="300" viewBox="0 0 1000 300">
+                        <!-- Step 1: 560mm Test -->
+                        <rect x="50" y="50" width="120" height="60" fill="#ff6b47" stroke="#e55a3c" stroke-width="2" rx="5"/>
+                        <text x="110" y="75" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">560mm</text>
+                        <text x="110" y="90" class="dimensions" text-anchor="middle" fill="white">CAPP Test</text>
+                        <text x="110" y="130" class="dimensions" text-anchor="middle" font-size="10px">Measured IES Data</text>
+                        
+                        <!-- Arrow 1 -->
+                        <path d="M 180 80 L 220 80" stroke="#2c3e50" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+                        <text x="200" y="70" class="dimensions" text-anchor="middle" font-size="10px">PDRP + CLIM</text>
+                        <text x="200" y="100" class="dimensions" text-anchor="middle" font-size="10px">Processing</text>
+                        
+                        <!-- Step 2: 1mm Unit -->
+                        <rect x="230" y="50" width="120" height="60" fill="#27ae60" stroke="#229954" stroke-width="2" rx="5"/>
+                        <text x="290" y="75" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">1mm</text>
+                        <text x="290" y="90" class="dimensions" text-anchor="middle" fill="white">PDRP Unit</text>
+                        <text x="290" y="130" class="dimensions" text-anchor="middle" font-size="10px">Normalized via ANFS</text>
+                        
+                        <!-- Arrow 2 -->
+                        <path d="M 360 80 L 400 80" stroke="#2c3e50" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+                        <text x="380" y="70" class="dimensions" text-anchor="middle" font-size="10px">Linear</text>
+                        <text x="380" y="100" class="dimensions" text-anchor="middle" font-size="10px">Multiplication</text>
+                        
+                        <!-- Step 3: Any Length -->
+                        <rect x="410" y="50" width="120" height="60" fill="#3498db" stroke="#2980b9" stroke-width="2" rx="5"/>
+                        <text x="470" y="75" class="dimensions" text-anchor="middle" fill="white" font-weight="bold">Any Length</text>
+                        <text x="470" y="90" class="dimensions" text-anchor="middle" fill="white">Installation</text>
+                        <text x="470" y="130" class="dimensions" text-anchor="middle" font-size="10px">PDRP-Validated Performance</text>
+                        
+                        <!-- AHDA Hemisphere Processing Box -->
+                        <rect x="600" y="30" width="350" height="120" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2" rx="8"/>
+                        <text x="775" y="50" class="dimensions" text-anchor="middle" font-weight="bold" font-size="12px">AHDA Hemisphere Processing Engine</text>
+                        
+                        <!-- Direct -->
+                        <rect x="620" y="70" width="80" height="25" fill="#e74c3c" stroke="#c0392b" stroke-width="1" rx="3"/>
+                        <text x="660" y="85" class="dimensions" text-anchor="middle" fill="white" font-size="10px">Direct (0-90°)</text>
+                        
+                        <!-- Indirect -->
+                        <rect x="720" y="70" width="80" height="25" fill="#9b59b6" stroke="#8e44ad" stroke-width="1" rx="3"/>
+                        <text x="760" y="85" class="dimensions" text-anchor="middle" fill="white" font-size="10px">Indirect (90-180°)</text>
+                        
+                        <!-- Bidirectional -->
+                        <rect x="820" y="70" width="80" height="25" fill="#f39c12" stroke="#e67e22" stroke-width="1" rx="3"/>
+                        <text x="860" y="85" class="dimensions" text-anchor="middle" fill="white" font-size="10px">Bidirectional</text>
+                        
+                        <text x="775" y="115" class="dimensions" text-anchor="middle" font-size="10px">AHDA auto-detection with ANFS noise tolerance & CLIM flux preservation</text>
+                        <text x="775" y="130" class="dimensions" text-anchor="middle" font-size="10px">Circular-Linear Interpolation Matrix with advanced azimuthal sampling</text>
+                        
+                        <!-- Processing Flow -->
+                        <text x="500" y="200" class="dimensions" text-anchor="middle" font-weight="bold" font-size="14px">Advanced Scaling Engine Technologies</text>
+                        
+                        <text x="150" y="230" class="dimensions" text-anchor="middle" font-size="11px">• BCLT eliminates LTIE</text>
+                        <text x="150" y="245" class="dimensions" text-anchor="middle" font-size="11px">• CAPP methodology</text>
+                        <text x="150" y="260" class="dimensions" text-anchor="middle" font-size="11px">• IES LM-79 compliance</text>
+                        
+                        <text x="350" y="230" class="dimensions" text-anchor="middle" font-size="11px">• PDRP dimensional reduction</text>
+                        <text x="350" y="245" class="dimensions" text-anchor="middle" font-size="11px">• CLIM flux preservation</text>
+                        <text x="350" y="260" class="dimensions" text-anchor="middle" font-size="11px">• ANFS noise suppression</text>
+                        
+                        <text x="550" y="230" class="dimensions" text-anchor="middle" font-size="11px">• Linear scaling accuracy</text>
+                        <text x="550" y="245" class="dimensions" text-anchor="middle" font-size="11px">• Any continuous length</text>
+                        <text x="550" y="260" class="dimensions" text-anchor="middle" font-size="11px">• ±2% variance guarantee</text>
+                        
+                        <text x="800" y="230" class="dimensions" text-anchor="middle" font-size="11px">• AHDA hemisphere detection</text>
+                        <text x="800" y="245" class="dimensions" text-anchor="middle" font-size="11px">• Intelligent mode selection</text>
+                        <text x="800" y="260" class="dimensions" text-anchor="middle" font-size="11px">• Multi-directional capability</text>
+                        
+                        <!-- Define arrow marker -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+                            </marker>
+                        </defs>
+                    </svg><div class="caption">📊 PDRP Photometric Data Scaling Workflow with AHDA Processing</div></div></section>
+<footer>  © 2025 LB_Lighting P/L</footer>
+</main>
+</body></html>

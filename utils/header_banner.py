@@ -1,4 +1,4 @@
-
+﻿
 from __future__ import annotations
 from pathlib import Path
 import streamlit as st
@@ -20,3 +20,4 @@ def header_banner(app_root: Path) -> None:
     else:
         bits.append("IES ✗ missing")
     st.markdown(" • ".join(bits))
+

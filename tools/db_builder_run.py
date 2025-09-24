@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import sys, pathlib
 # make "utils" importable when running as a script
@@ -29,3 +29,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

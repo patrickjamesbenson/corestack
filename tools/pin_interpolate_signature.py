@@ -1,4 +1,4 @@
-# tools/pin_interpolate_signature.py
+﻿# tools/pin_interpolate_signature.py
 from __future__ import annotations
 import importlib, inspect, sys
 from pathlib import Path
@@ -140,3 +140,4 @@ print("[OK] Wrote pinned adapter using your interpolate_candela_matrix signature
 print(f"[INFO] Engine: {engine.__name__}")
 print(f"[INFO] interpolate_candela_matrix params: ({', '.join(params)})")
 print(f"[INFO] Mapped roles: v='{roles['v']}', h='{roles['h']}', clamp='{roles['clamp']}', norm='{roles['norm']}'")
+

@@ -1,0 +1,292 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UGR & Polar Curves — Mythbusters (Flattened)</title>
+<style>
+:root{--fg:#222;--bg:#fff;--muted:#666;--rule:#e5e7eb;--pill:#1a73e81a;--link:#1a73e8}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif}
+main{max-width:950px;margin:22px auto;padding:0 16px 48px}
+h1,h2,h3{line-height:1.2;margin:0 0 .6em}
+h1{font-size:1.7rem} h2{font-size:1.25rem} h3{font-size:1.05rem}
+p{margin:.6em 0} small,.muted{color:var(--muted)}
+header{padding:20px 16px;border-bottom:1px solid var(--rule);background:#fafafa}
+header .wrap{max-width:950px;margin:0 auto}
+nav.pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}
+nav.pills a{display:inline-block;padding:.35rem .7rem;border:1px solid var(--rule);border-radius:999px;text-decoration:none;color:#0b57d0;background:var(--pill)}
+nav.pills a:hover{background:#e8f0fe}
+section{padding:16px 0;border-bottom:1px dashed var(--rule)}
+ul{margin:.4em 0 .8em 1.1em} li{margin:.2em 0}
+.table{overflow:auto;border:1px solid var(--rule);border-radius:6px}
+.table table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:.5em .6em;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+.kbd{border:1px solid var(--rule);border-radius:4px;padding:0 .3em;background:#f8f9fa}
+.badge{display:inline-block;background:#eef6ff;border:1px solid #dbeafe;border-radius:.4rem;padding:.1rem .4rem}
+pre{background:#f8f9fa;border:1px solid var(--rule);border-radius:6px;padding:.6rem;overflow:auto}
+svg{max-width:100%;height:auto;display:block}
+.figure{border:1px solid var(--rule);border-radius:8px;padding:10px;margin:.6rem 0;background:#fff}
+.caption{color:var(--muted);font-size:.9em;margin-top:.3rem}
+.grid{display:grid;gap:10px}
+@media(min-width:800px){.grid.cols-2{grid-template-columns:1fr 1fr}.grid.cols-3{grid-template-columns:repeat(3,1fr)}}
+footer{color:var(--muted);font-size:.9em;padding-top:8px}
+</style>
+</head><body>
+<header><div class="wrap">
+  <h1>UGR & Polar Curves: Engineering Mythbusters Guide</h1>
+  <div class="muted">Flattened single-file web doc. Quick, lightweight, and linkable. Generated 2025-09-24.</div>
+  <nav class="pills">
+    <a href="#myths">Myths</a>
+    <a href="#ugr">UGR Tables</a>
+    <a href="#polar">Polar Curves</a>
+    <a href="#cheats">Cheat Sheets</a>
+    <a href="#glossary">Glossary</a>
+    <a href="#decision">Decision Trees</a>
+    <a href="#rules">Golden Rules</a>
+    <a href="#standards">Standards</a>
+  </nav>
+</div></header>
+<main>
+
+<section id="myths"><h2>🚨 The Big Myths to Bust</h2>
+<h3>Myth #1: “My luminaire has UGR &lt; 19, so my installation will too”</h3>
+<p><b>BUSTED!</b> UGR is not a fixture property—it's an installation property. Same fixture can produce:
+<ul>
+<li>UGR ≈ 16 in a large room with light walls</li>
+<li>UGR ≈ 24 in a small room with dark walls</li>
+<li><b>Always calculate for your specific installation.</b></li>
+</ul>
+</p>
+<h3>Myth #2: “Higher light levels mean more glare”</h3>
+<p><b>BUSTED!</b> Brighter surroundings often reduce glare:
+<ul>
+<li>Higher background luminance → lower UGR</li>
+<li>This is why indirect lighting helps</li>
+<li>Dark rooms with bright lights = worst case</li>
+</ul>
+</p>
+<h3>Myth #3: “Polar curves are too complex”</h3>
+<p><b>BUSTED!</b> They're just light maps: distance from centre = brightness; angle = direction.</p>
+
+<div class="grid cols-2">
+<div class="figure">
+<svg viewBox="0 0 300 220" role="img" aria-label="UGR concept diagram">
+<rect x="0" y="0" width="300" height="220" fill="#fff"/>
+<!-- room -->
+<rect x="10" y="10" width="280" height="200" fill="#f5f7ff" stroke="#c9d2ff"/>
+<!-- luminaire -->
+<rect x="130" y="20" width="40" height="10" fill="#111"/>
+<!-- observer -->
+<circle cx="150" cy="190" r="8" fill="#888"/>
+<!-- bright sources -->
+<circle cx="90" cy="90" r="5" fill="#ffd54f"/>
+<circle cx="210" cy="100" r="7" fill="#ffd54f"/>
+<!-- rays -->
+<line x1="150" y1="190" x2="90" y2="90" stroke="#ffb300"/>
+<line x1="150" y1="190" x2="210" y2="100" stroke="#ffb300"/>
+<text x="150" y="210" text-anchor="middle" font-size="10" fill="#666">UGR depends on bright sources vs. background</text>
+</svg>
+<div class="caption">UGR relates the contrast of bright sources against the field of view.</div>
+</div>
+
+<div class="figure">
+<svg viewBox="0 0 300 220" role="img" aria-label="Background luminance and glare">
+<rect x="0" y="0" width="300" height="220" fill="#fff"/>
+<!-- left: dark room -->
+<rect x="10" y="10" width="130" height="200" fill="#1c1c1c" stroke="#333"/>
+<circle cx="75" cy="60" r="14" fill="#ffd54f"/>
+<text x="75" y="140" text-anchor="middle" font-size="11" fill="#ddd">Dark room → higher UGR</text>
+<!-- right: light room -->
+<rect x="160" y="10" width="130" height="200" fill="#f3f6ff" stroke="#cbd5ff"/>
+<circle cx="225" cy="60" r="14" fill="#ffd54f"/>
+<text x="225" y="140" text-anchor="middle" font-size="11" fill="#555">Light room → lower UGR</text>
+</svg>
+<div class="caption">Brighter surroundings (higher background luminance) lower perceived glare.</div>
+</div>
+</div>
+</section>
+
+<section id="ugr"><h2>Part 1: UGR Tables Demystified</h2>
+<h3>What is UGR?</h3>
+<p><b>Unified Glare Rating</b> — a number predicting discomfort glare in a given installation.</p>
+<p><b>The Scale:</b></p>
+<div class="table"><table>
+<thead><tr><th>UGR</th><th>Interpretation</th></tr></thead>
+<tbody>
+<tr><td>10–13</td><td>No glare</td></tr>
+<tr><td>16</td><td>Just noticeable</td></tr>
+<tr><td>19</td><td>Office limit ⚠️</td></tr>
+<tr><td>22</td><td>Acceptable discomfort</td></tr>
+<tr><td>25</td><td>Uncomfortable</td></tr>
+<tr><td>28+</td><td>Intolerable</td></tr>
+</tbody></table></div>
+
+<h3>The Simple Formula</h3>
+<pre>UGR = 8 × log₁₀ [ Bright Lights / Background Brightness ]</pre>
+<p><b>Translation:</b> bright lights in dark rooms → high UGR.</p>
+
+<h3>Quick Reference Standards</h3>
+<div class="table"><table>
+<thead><tr><th>Space Type</th><th>Max UGR</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>CAD/Drawing</td><td>≤ 16</td><td>Design studios</td></tr>
+<tr><td>Office</td><td>≤ 19</td><td>Most workplaces</td></tr>
+<tr><td>Reception</td><td>≤ 22</td><td>Lobbies</td></tr>
+<tr><td>Warehouse</td><td>≤ 25</td><td>Storage areas</td></tr>
+</tbody></table></div>
+
+<h3>How to Read UGR Tables</h3>
+<ul>
+<li><b>Find room size.</b> Rooms shown as multiples of H (mounting height).</li>
+<li><b>Reflectances.</b> 70/50/20 = ceiling/walls/floor (light/medium/dark).</li>
+<li><b>Views.</b> Crosswise (worst) and endwise (best) — rotate luminaires if needed.</li>
+</ul>
+</section>
+
+<section id="polar"><h2>Part 2: Polar Curves Made Simple</h2>
+<p>Polar plots are light maps: rings indicate intensity levels; the angle indicates direction; distance from centre indicates brightness.</p>
+
+<div class="grid cols-3">
+<div class="figure">
+<svg viewBox="0 0 220 220" role="img" aria-label="Polar plot with rings and axes">
+<rect width="220" height="220" fill="#fff"/>
+<g transform="translate(110,110)" stroke="#e5e7eb" fill="none">
+  <circle r="90"/><circle r="70"/><circle r="50"/><circle r="30"/><circle r="10"/>
+  <line x1="-100" y1="0" x2="100" y2="0" stroke="#d1d5db"/>
+  <line x1="0" y1="-100" x2="0" y2="100" stroke="#d1d5db"/>
+</g>
+<g transform="translate(110,110)" fill="none" stroke="#0b57d0">
+  <!-- example wide pattern -->
+  <path d="M0,-60 C30,-50 60,-10 60,0 C60,10 30,50 0,60 C-30,50 -60,10 -60,0 C-60,-10 -30,-50 0,-60 Z"/>
+</g>
+<text x="110" y="210" text-anchor="middle" font-size="11" fill="#666">Polar plot rings and axes</text>
+</svg>
+<div class="caption">Rings = intensity steps; axes mark 0°/90°/180°/270°.</div>
+</div>
+
+<div class="figure">
+<svg viewBox="0 0 220 220" role="img" aria-label="Common polar patterns">
+<rect width="220" height="220" fill="#fff"/>
+<g transform="translate(110,110)" fill="none">
+  <!-- narrow -->
+  <path d="M0,-70 C15,-60 25,-20 25,0 C25,20 15,60 0,70 C-15,60 -25,20 -25,0 C-25,-20 -15,-60 0,-70 Z"
+        stroke="#0b57d0"/>
+  <!-- batwing -->
+  <path d="M0,-20 C40,-40 40,40 0,20 C-40,40 -40,-40 0,-20 Z" stroke="#d93025"/>
+  <!-- asymmetric -->
+  <path d="M-10,-15 C60,-30 60,30 -10,15 Z" stroke="#188038"/>
+</g>
+<text x="110" y="200" text-anchor="middle" font-size="11" fill="#666">Narrow (blue), batwing (red), asymmetric (green)</text>
+</svg>
+<div class="caption">Pattern shapes map directly to application intent.</div>
+</div>
+
+<div class="figure">
+<svg viewBox="0 0 220 220" role="img" aria-label="C-planes">
+<rect width="220" height="220" fill="#fff"/>
+<g transform="translate(110,110)">
+  <rect x="-50" y="-15" width="100" height="30" fill="#444"/>
+  <text x="0" y="-35" text-anchor="middle" font-size="12" fill="#555">Luminaire</text>
+  <line x1="-100" y1="0" x2="100" y2="0" stroke="#1a73e8"/>
+  <text x="100" y="-5" text-anchor="end" font-size="11" fill="#1a73e8">C0–180</text>
+  <line x1="0" y1="-100" x2="0" y2="100" stroke="#d93025"/>
+  <text x="5" y="-85" font-size="11" fill="#d93025">C90–270</text>
+</g>
+</svg>
+<div class="caption">Two critical planes: C0–180 (lengthwise) and C90–270 (crosswise).</div>
+</div>
+</div>
+</section>
+
+<section id="cheats"><h2>Part 3: Practical Cheat Sheets</h2>
+<h3>UGR Troubleshooting</h3>
+<div class="table"><table>
+<thead><tr><th>Problem</th><th>Solution</th></tr></thead>
+<tbody>
+<tr><td>UGR too high</td><td>Add indirect lighting; lighten surfaces; use lower brightness fixtures; increase spacing</td></tr>
+<tr><td>Hot spots</td><td>Check polar curve for narrow beam; use batwing distribution</td></tr>
+<tr><td>Dark walls = high UGR</td><td>Add wall washers; use luminaires with uplight</td></tr>
+</tbody></table></div>
+
+<h3>Beam Angle Quick Guide</h3>
+<ul>
+<li><b>Beam angle</b>: intensity drops to 50%</li>
+<li><b>Field angle</b>: intensity drops to 10%</li>
+<li><b>Cutoff angle</b>: lamp not directly visible</li>
+<li><b>Rule of thumb:</b> Narrow &lt; 25° (accent) • 25–40° (task) • &gt; 40° (general)</li>
+</ul>
+
+<h3>Software Reality Check</h3>
+<ol>
+<li><b>“Loss of symmetry”</b> → distribution is asymmetric; check setup</li>
+<li><b>“Invalid IES”</b> → file corrupted; obtain a new one</li>
+<li><b>UGR = “--”</b> → not enough luminaires or room too small</li>
+</ol>
+<p><span class="badge">Simplest → Most Complex</span> Visual → DIALux → AGi32 → Relux</p>
+</section>
+
+<section id="glossary"><h2>Part 4: The Essential Glossary</h2>
+<ul>
+<li><b>Candela (cd)</b>: light intensity in one direction</li>
+<li><b>Lumen (lm)</b>: total light output</li>
+<li><b>Lux</b>: light incident on a surface</li>
+<li><b>Gamma (γ)</b>: vertical angle (0° down, 90° horizontal, 180° up)</li>
+<li><b>C-plane</b>: horizontal angle around the luminaire</li>
+<li><b>Mounting Height (H)</b>: fixture to work plane</li>
+<li><b>Guth Position Index</b>: positional glare factor</li>
+</ul>
+<p><b>The Big Three Standards:</b> CIE 117:1995 • EN 12464-1 • AS/NZS 1680</p>
+</section>
+
+<section id="decision"><h2>Quick Decision Trees</h2>
+<h3>Do I have a glare problem?</h3>
+<pre>People complaining? → YES → Check UGR
+                ↓
+                NO
+                ↓
+Is it an office? → YES → Should be UGR ≤ 19
+                ↓
+                NO
+                ↓
+Check the standard for your space type</pre>
+
+<h3>Which polar curve do I need?</h3>
+<pre>General lighting → Batwing or wide distribution
+Task lighting    → Narrow beam with good cutoff
+Accent lighting  → Narrow beam, adjustable
+Street lighting  → Asymmetric Type III</pre>
+</section>
+
+<section id="rules"><h2>The Golden Rules</h2>
+<ol>
+<li>UGR is calculated, not measured — you need software.</li>
+<li>Room matters as much as fixture — same light, different room ≠ same UGR.</li>
+<li>Brighter walls = less glare — paint is cheaper than new luminaires.</li>
+<li>Check both viewing directions — rotate fixtures if needed.</li>
+<li>When in doubt, add indirect — uplight reduces glare.</li>
+</ol>
+
+<h3>Common Rookie Mistakes</h3>
+<ul>
+<li>Trusting “UGR&lt;19” marketing claims → <b>calculate for your room</b></li>
+<li>Dark colours everywhere → <b>light ceilings, medium walls</b></li>
+<li>Ignoring viewing direction → <b>check crosswise and endwise</b></li>
+<li>“More fixtures = more glare” → <b>proper spacing often reduces glare</b></li>
+<li>Relying on dimming to fix glare → <b>fix distribution, not only intensity</b></li>
+</ul>
+</section>
+
+<section id="standards"><h2>Standards Quick Reference</h2>
+<div class="table"><table>
+<thead><tr><th>Region</th><th>Standard</th><th>Office UGR</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>International</td><td>CIE 117:1995</td><td>≤ 19</td><td>Original method</td></tr>
+<tr><td>Europe</td><td>EN 12464-1</td><td>≤ 19</td><td>Workplaces</td></tr>
+<tr><td>Australia/NZ</td><td>AS/NZS 1680.2</td><td>≤ 19</td><td>Considers daylight</td></tr>
+<tr><td>North America</td><td>IES</td><td>Varies</td><td>Application-specific</td></tr>
+</tbody></table></div>
+</section>
+
+<footer>
+  © 2025 LB_Lighting P/L
+</footer>
+</main>
+</body></html>

@@ -1,4 +1,4 @@
-# utils/provenance.py
+﻿# utils/provenance.py
 from __future__ import annotations
 from typing import Any, Dict, List, Optional
 import os, json, hashlib, datetime
@@ -199,3 +199,4 @@ def load_working_from_record(rec_id: str) -> Optional[Dict[str, Any]]:
         return json.loads(Path(p).read_text(encoding="utf-8"))
     except Exception:
         return None
+

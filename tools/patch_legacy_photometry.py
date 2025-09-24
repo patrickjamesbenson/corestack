@@ -1,4 +1,4 @@
-# tools/patch_legacy_photometry.py
+﻿# tools/patch_legacy_photometry.py
 from __future__ import annotations
 import re
 from pathlib import Path
@@ -61,3 +61,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

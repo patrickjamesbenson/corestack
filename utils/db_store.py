@@ -1,4 +1,4 @@
-# utils/db_store.py
+﻿# utils/db_store.py
 from __future__ import annotations
 from typing import Any, Dict
 from pathlib import Path
@@ -26,3 +26,4 @@ def spreadsheet_id_from(url_or_id: str) -> str:
 
 def stamp_now() -> str:
     return time.strftime("%Y-%m-%d %H:%M:%S")
+

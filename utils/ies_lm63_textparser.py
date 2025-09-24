@@ -1,4 +1,4 @@
-# utils/ies_lm63_textparser.py
+﻿# utils/ies_lm63_textparser.py
 from __future__ import annotations
 from typing import Any, Dict, List
 import re
@@ -164,3 +164,4 @@ def parse_ies_text(raw_text: str) -> Dict[str, Any]:
     }
 
     return {"meta": meta, "tilt": tilt, "geometry": geometry, "photometry": photometry}
+

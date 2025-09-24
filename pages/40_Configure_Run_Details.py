@@ -1,31 +1,25 @@
-﻿# pages/20_Select_Luminaire_Attributes.py
+﻿# pages/40_Build_Luminaire.py
 from __future__ import annotations
 from pathlib import Path
 import streamlit as st
 
-# small, stable sidebar
 from utils.ui_nav import render_sidebar
-render_sidebar("Workflow / Select Luminaire Attributes")
+render_sidebar("Workflow / Build Luminaire")
 
-st.title("Select Luminaire Attributes")
+st.title("Build Luminaire")
 
-# App root (…/CoreStack_workspace)
 APP_ROOT = Path(__file__).resolve().parents[1]
-
-# Candidates (keep a few for backward compatibility)
 candidates = [
-    APP_ROOT / "legacy_src" / "select_app_u_full.py",                         # <- your current file
-    APP_ROOT / "legacy_src" / "select_app_ui_full.py",                        # another common name
-    APP_ROOT / "legacy_src" / "Select_Luminaire_Attributes" / "app_ui_full.py",
+    APP_ROOT / "legacy_src" / "segment_batch_ui.py",   # <- your current file (had BOM)
+    APP_ROOT / "legacy_src" / "Segment_UI" / "segment_batch_ui.py",
 ]
 
 def _load_and_exec(p: Path) -> None:
-    # Read with utf-8-sig to strip any BOM automatically
+    # Read with utf-8-sig to eliminate BOM (U+FEFF) that caused the SyntaxError
     src = p.read_text(encoding="utf-8-sig")
     glb = {"__name__": "__legacy__"}
     exec(compile(src, str(p), "exec"), glb, glb)
 
-# Pick the first that exists
 target = next((p for p in candidates if p.exists()), None)
 
 if target is None:

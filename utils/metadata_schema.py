@@ -1,4 +1,4 @@
-# utils/metadata_schema.py
+﻿# utils/metadata_schema.py
 from __future__ import annotations
 from pathlib import Path
 import json
@@ -9,3 +9,4 @@ def load_schema_from_json(path: Path) -> Dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError("Schema JSON must be an object at top level.")
     return data
+

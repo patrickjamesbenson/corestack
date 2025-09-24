@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 import os, shutil
 from pathlib import Path
 
@@ -26,3 +26,4 @@ def link_or_copy(src: Path, dst: Path):
     except OSError as ex:
         shutil.copyfile(src, dst)
         return False, f"copied (link failed: {ex})"
+

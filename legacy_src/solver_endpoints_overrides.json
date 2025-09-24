@@ -1,0 +1,9 @@
+{
+  "one_sheet_tab": "one_sheet_schema_template",
+  "column_renames": {
+    "flux_warm_25C_lm_per_m_ref": "flux_warm_25C_lm_per_m_ref",
+    "flux_warm_65C_lm_per_m_ref": "flux_warm_65C_lm_per_m_ref",
+    "flux_cool_25C_lm_per_m_ref": "flux_cool_25C_lm_per_m_ref",
+    "flux_cool_65C_lm_per_m_ref": "flux_cool_65C_lm_per_m_ref"
+  }
+}

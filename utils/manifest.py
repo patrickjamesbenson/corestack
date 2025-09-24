@@ -1,4 +1,4 @@
-# utils/manifest.py
+﻿# utils/manifest.py
 from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict
@@ -34,3 +34,4 @@ def resolve_legacy_path(app_root: Path, rel: str | None) -> Path | None:
     if not rel:
         return None
     return (app_root / "legacy_src" / rel).resolve()
+

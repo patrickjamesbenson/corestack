@@ -1,4 +1,4 @@
-your_app_root/
+﻿your_app_root/
 ├─ app.py
 ├─ utils/
 │  ├─ novon_loader.py          # sibling-first loader + reload()
@@ -21,3 +21,4 @@ your_app_root/
    └─ assets/
       ├─ novon_workflow.json   # canonical workflow
       └─ ies_repo.json         # ***canonical IES repo written by IES Builder***
+

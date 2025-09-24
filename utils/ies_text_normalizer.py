@@ -1,4 +1,4 @@
-# utils/ies_text_normalizer.py
+﻿# utils/ies_text_normalizer.py
 from __future__ import annotations
 from typing import Union
 
@@ -11,9 +11,10 @@ def normalize_ies_text(data: Union[str, bytes]) -> str:
             s = data.decode("latin-1", errors="replace")
     else:
         s = data
-    if s.startswith("\ufeff"):
-        s = s.lstrip("\ufeff")
+    if s.startswith("\"):
+        s = s.lstrip("\")
     s = s.replace("\r\n", "\n").replace("\r", "\n")
     s = s.replace("\u00A0", " ").replace("\t", " ")
     s = "\n".join(line.rstrip() for line in s.split("\n"))
     return s
+

@@ -1,0 +1,22 @@
+Section (tab),Key / Column(s),Used for,JSON filter / path,New Section (opt),New Key/Column (opt),Notes
+SETTINGS,default_temp_C,Initial ambient/reference temperature,tables.<one_sheet_tab> where section='SETTINGS' & key='default_temp_C' -> value,,,
+SETTINGS,default_solver_mA_step,Legacy slider step (kept),… key='default_solver_mA_step' -> value,,,
+SETTINGS,mA_min_global / mA_max_global,Clamp bounds for computed current,"… key in {'mA_min_global','mA_max_global'} -> value",,,
+SETTINGS,flux_min_lm_per_m / flux_max_lm_per_m,Hard bounds for the Flux slider,"… key in {'flux_min_lm_per_m','flux_max_lm_per_m'} -> value",,,
+SETTINGS,dali_physical_min_pct / dali_physical_max_pct,IEC/linear mapping physical min/max (%),"… key in {'dali_physical_min_pct','dali_physical_max_pct'} -> value",,,
+SETTINGS,dt8_supported_types,"Enable colour types: TC,XY,RGBWAF (comma-separated)",… key='dt8_supported_types' -> value,,,
+SETTINGS,dt8_primary_labels,Order of primaries for RGBWAF (subset of RGBWAF),… key='dt8_primary_labels' -> value,,,"e.g., 'RGBW' or 'RGBWAF'"
+ENGINE,"engine_id, gen, mode",Top-level selection and mode branch (SC/TW),where engine_id==X & gen==Y,,,
+ENGINE,cri_supported,Allowed CRI list,"… -> list or '80,90'",,,
+ENGINE,mA_ref,Reference current (TW scaling),… -> float,,,
+ENGINE,cct_nom_K,Nominal CCT for SC factor anchors,… -> float,,,
+ENGINE,"tw_warm_K, tw_cool_K",TW channel anchor CCTs,… -> float,,,
+ENGINE,"cct_min_K, cct_max_K",Allowed CCT range and DT8 range,… -> float,,,
+ENGINE,flux_warm_25C_lm_per_m_ref / flux_warm_65C_lm_per_m_ref,TW warm channel reference flux vs temp,… -> float,,,
+ENGINE,flux_cool_25C_lm_per_m_ref / flux_cool_65C_lm_per_m_ref,TW cool channel reference flux vs temp,… -> float,,,
+FACTORS,gen_gain_x,Generation gain multiplier,where engine_id==X & gen==Y,,,
+FACTORS,"cri80_x, cri90_x",CRI multipliers,…,,,
+FACTORS,"CCT anchors: 3000K_x, 35k_x, 4000_x etc.",SC: interpolate factor by nominal CCT,… any column ending with '_x',,,"Accepted: '3000K_x','30k_x','35k_x'"
+CURVE,"channel=SC, temp_C ∈ {25,65}, mA, flux_lm_per_m, power_W_per_m","SC interpolation: flux/power at mA, blended by temp",where engine_id==X & gen==Y & channel=='SC',,,Needs ≥2 mA points at 25 °C and 65 °C
+—,DT6 arc (linear + IEC log),Both codes computed; IEC generalized to [dali_physical_min_pct.._max_pct] (%),percent = 100 * flux/flux_max_ref; arc_linear & arc_iec stored to scenes,,,IEC: n = 1 + 253*(log10(%)-log10(min%)) / (log10(max%)-log10(min%)); 0% -> 0
+—,DT8 Tc / xy / RGBWAF,Colour outputs for DT8,"TC: Tc mired; xy: x,y codes; RGBWAF: per-primary codes",,,

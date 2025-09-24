@@ -1,4 +1,4 @@
-
+﻿
 from __future__ import annotations
 import types
 
@@ -14,3 +14,4 @@ def _streamlit_stub() -> types.ModuleType:
         columns=lambda *a, **k: [], experimental_rerun=_noop,
     )
     return st
+

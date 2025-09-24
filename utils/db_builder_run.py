@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 import argparse
 from pathlib import Path
 from utils.builder import build_database
@@ -18,3 +18,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

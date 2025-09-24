@@ -1,0 +1,140 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ANSI/IES LM‑63‑2019 — Quick Reference (Flattened)</title>
+<style>
+/* Minimal, lightweight CSS (no external fonts) */
+:root{--fg:#222;--bg:#fff;--muted:#666;--acc:#1a73e8;--rule:#e5e7eb}
+*{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif}
+main{max-width:880px;margin:24px auto;padding:0 16px 48px}
+h1,h2,h3{line-height:1.2;margin:0 0 .5em} h1{font-size:1.6rem} h2{font-size:1.15rem} h3{font-size:1rem}
+small, .muted{color:var(--muted)}
+header{padding:20px 16px;border-bottom:1px solid var(--rule);background:#fafafa}
+header .title{max-width:880px;margin:0 auto}
+nav{margin:12px 0 0;display:flex;flex-wrap:wrap;gap:.5rem}
+nav a{color:var(--acc);text-decoration:none;border:1px solid var(--rule);border-radius:999px;padding:.25rem .6rem}
+section{padding:16px 0;border-bottom:1px dashed var(--rule)}
+code,.mono{font-family:ui-monospace,Consolas,Menlo,Monaco,monospace;font-size:.92em}
+ul{margin:.4em 0 .8em 1.1em} li{margin:.2em 0}
+.table{overflow:auto;border:1px solid var(--rule);border-radius:6px}
+.table table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:.5em .6em;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+.badge{display:inline-block;background:#eef6ff;border:1px solid #dbeafe;border-radius:.4rem;padding:.1rem .4rem}
+kbd{border:1px solid var(--rule);border-radius:4px;padding:0 .3em;background:#f8f9fa}
+footer{color:var(--muted);font-size:.9em;padding-top:8px}
+</style>
+</head><body>
+<header><div class="title">
+  <h1>ANSI/IES LM‑63‑2019 — Quick Reference (Flattened)</h1>
+  <div class="muted">Approved Method: Standard file format for the electronic transfer of photometric data.<br>
+  Flattened single‑file HTML, paraphrased for compactness and speedy viewing.</div>
+  <nav>
+    <a href="#scope">Scope</a>
+    <a href="#defs">Key definitions</a>
+    <a href="#changes">What changed vs 2002</a>
+    <a href="#format">LM‑63 file layout</a>
+    <a href="#keywords">Required keywords</a>
+    <a href="#tilt">TILT line</a>
+    <a href="#dims">Luminous dimensions</a>
+    <a href="#angles">Angles & values</a>
+    <a href="#notes">Conventions</a>
+  </nav>
+</div></header>
+<main>
+<section id="intro"><h2>1. Introduction</h2>
+<p>LM‑63 is the long‑standing IES standard describing the plain‑text <span class="mono">.IES</span> file format for luminaire photometric data.
+This 2019 revision clarifies terminology and sets LM‑63 into a “stability” phase while an XML successor (TM‑33) matures. Both remain valid during the transition.</p>
+</section>
+
+<section id="scope"><h2>2. Scope</h2>
+<p>Defines the data fields and ordering for photometric files used for transfer, storage, retrieval and calculation workflows.</p>
+</section>
+
+<section id="defs"><h2>3. Key definitions (abridged)</h2>
+<ul>
+  <li><b>Absolute photometry</b>: Candela values measured directly for the test luminaire (lamp lumens not used).</li>
+  <li><b>Relative photometry</b>: Candela values scaled relative to a reference lamp’s rated lumens.</li>
+  <li><b>Photometric zero</b>: Direction directly below the source at test position (Type B &amp; C: H=0°, V=0°).</li>
+  <li><b>Photometric horizontal</b>: “Straight ahead” direction (Type B &amp; C: H=0°, V=90°).</li>
+  <li><b>Photometric plane</b>: Plane on which data are measured (vertical in Types A &amp; C; horizontal axis for Type B).</li>
+  <li><b>Horizontal / Vertical angles</b>: Angle grids defining measurement directions per goniophotometer type.</li>
+  <li><b>Keyword</b>: Square‑bracketed label lines (e.g., <span class="mono">[TEST]</span>) that precede the numeric blocks.</li>
+</ul>
+</section>
+
+<section id="changes"><h2>4. What changed vs LM‑63‑02 (high level)</h2>
+<ul>
+  <li>Clarified definitions (photometric zero/horizontal; absolute vs relative).</li>
+  <li>Replaced &lt;future use&gt; with <b>&lt;file generation type&gt;</b> plus optional <span class="mono">[FILEGENINFO]</span>.</li>
+  <li>Removed <span class="mono">TILT=&lt;filename&gt;</span> option; now use <span class="mono">TILT=NONE</span> or <span class="mono">TILT=INCLUDE</span>.</li>
+</ul>
+</section>
+
+<section id="format"><h2>5. LM‑63 file layout (essentials)</h2>
+<p>An LM‑63‑2019 file is plain text with this sequence:</p>
+<div class="table"><table>
+<thead><tr><th>#</th><th>Line / field</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><span class="mono">IES:LM-63-2019</span></td><td>Mandatory first line.</td></tr>
+<tr><td>2…</td><td><span class="mono">[KEYWORD] value</span></td><td>Any number of defined keywords (see below).</td></tr>
+<tr><td>—</td><td><span class="mono">TILT=NONE</span> <span class="muted">or</span> <span class="mono">TILT=INCLUDE</span></td><td>Marks end of keyword block.</td></tr>
+<tr><td>—</td><td><span class="mono">&lt;#lamps&gt; &lt;lumens/lamp&gt; &lt;mult&gt; &lt;#V&gt; &lt;#H&gt; &lt;type&gt; &lt;units&gt; &lt;width&gt; &lt;length&gt; &lt;height&gt;</span></td><td>Core header numbers.</td></tr>
+<tr><td>—</td><td><span class="mono">&lt;ballast factor&gt; &lt;file generation type&gt; &lt;input watts&gt;</span></td><td>Header continued.</td></tr>
+<tr><td>—</td><td><span class="mono">&lt;vertical angles&gt;</span></td><td>Monotonic 0→… list.</td></tr>
+<tr><td>—</td><td><span class="mono">&lt;horizontal angles&gt;</span></td><td>Monotonic 0→… list.</td></tr>
+<tr><td>—</td><td><span class="mono">&lt;candela values&gt;</span></td><td>One block per H‑angle; values ordered by V‑angles.</td></tr>
+</tbody></table></div>
+<p><span class="badge">Photometric type</span> 1=Type C, 2=Type B, 3=Type A. <span class="badge">Units</span> 1=feet, 2=metres.</p>
+</section>
+
+<section id="keywords"><h2>5.2 Required keywords (minimum set)</h2>
+<ul>
+  <li><span class="mono">[TEST]</span> — test report ID</li>
+  <li><span class="mono">[TESTLAB]</span> — testing laboratory</li>
+  <li><span class="mono">[ISSUEDATE]</span> — file issue date</li>
+  <li><span class="mono">[MANUFAC]</span> — manufacturer</li>
+</ul>
+<p>Common useful extras: <span class="mono">[LUMCAT]</span>, <span class="mono">[LUMINAIRE]</span>, <span class="mono">[LAMPCAT]</span>, <span class="mono">[LAMP]</span>, <span class="mono">[OTHER]</span>, <span class="mono">[FILEGENINFO]</span>.</p>
+</section>
+
+<section id="tilt"><h2>5.3 TILT line</h2>
+<ul>
+  <li><span class="mono">TILT=NONE</span> if output does not vary with tilt (skip tilt block).</li>
+  <li><span class="mono">TILT=INCLUDE</span> if tilt multipliers are embedded (see Annex F format).</li>
+</ul>
+<p><b>Absolute photometry</b>: set &lt;lumens per lamp&gt; to <span class="mono">-1</span> and note absolute candela in <span class="mono">[OTHER]</span>.</p>
+</section>
+
+<section id="dims"><h2>5.10 Luminous dimensions</h2>
+<p>Describe the luminous opening at photometric zero (not the housing size): <b>units</b> (1=ft, 2=m), <b>width</b>, <b>length</b>, <b>height</b>.
+Orientation is with respect to the zero‑degree photometric plane; <em>length may be less than width</em> depending on orientation conventions.</p>
+</section>
+
+<section id="angles"><h2>Angles & candela values</h2>
+<ul>
+  <li>&lt;#vertical&gt; and &lt;#horizontal&gt; give list lengths; angle lists are ascending.</li>
+  <li>Candela blocks are provided for each horizontal angle in sequence, each block covering all vertical angles.</li>
+  <li>&lt;multiplier&gt; scales all candela values if not 1.0.</li>
+</ul>
+</section>
+
+<section id="notes"><h2>Programming & file conventions (brief)</h2>
+<ul>
+  <li>Delimiters may be commas, spaces, multiple spaces, or CRLF.</li>
+  <li>Filenames end with <span class="mono">.ies</span> / <span class="mono">.IES</span>.</li>
+  <li>Use keywords from the defined list; keep angle lists well‑formed and monotonic.</li>
+</ul>
+</section>
+
+<section id="annex"><h2>Annex references (at a glance)</h2>
+<ul>
+  <li>Annex A — Keyword rules; Annex B — Valid keywords list</li>
+  <li>Annex C — Example IES file</li>
+  <li>Annex F — <span class="mono">TILT=INCLUDE</span> data format</li>
+</ul>
+</section>
+
+<footer>
+  Generated on 2025-09-24. This page paraphrases, condenses and re‑formats LM‑63‑2019 standard for compact, single‑file viewing.
+</footer>
+</main>
+</body></html>

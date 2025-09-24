@@ -1,4 +1,4 @@
-# utils/novon_loader.py
+﻿# utils/novon_loader.py
 from __future__ import annotations
 import os, json, re
 from pathlib import Path
@@ -60,3 +60,4 @@ def load_workflow_json() -> Dict[str, Any]:
 def reload_workflow_json() -> Dict[str, Any]:
     app_root = Path(__file__).resolve().parents[1]
     return _load_from_disk(app_root)
+

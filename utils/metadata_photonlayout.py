@@ -1,4 +1,4 @@
-# utils/metadata_photonlayout.py
+﻿# utils/metadata_photonlayout.py
 from __future__ import annotations
 from typing import Any, Dict, List, Optional
 from pathlib import Path
@@ -83,3 +83,4 @@ def _rr(x: Optional[float], nd: int = 4) -> Optional[float]:
     if x is None or (isinstance(x,float) and (math.isnan(x) or math.isinf(x))): return None
     try: return round(float(x), nd)
     except: return None
+

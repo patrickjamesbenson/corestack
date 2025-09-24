@@ -1,4 +1,4 @@
-# tools/quick_fixes.py
+﻿# tools/quick_fixes.py
 from __future__ import annotations
 import re, sys
 from pathlib import Path
@@ -85,8 +85,8 @@ def strip_bom_from_segment_ui():
     else:
         # Sometimes files contain a stray U+FEFF at start without BOM header
         txt = raw.decode("utf-8", errors="ignore")
-        if txt and txt[0] == "\ufeff":
-            f.write_text(txt.lstrip("\ufeff"), encoding="utf-8")
+        if txt and txt[0] == "\":
+            f.write_text(txt.lstrip("\"), encoding="utf-8")
             print("[FIXED] Stripped leading U+FEFF from segment_batch_ui.py")
         else:
             print("[OK] No BOM in segment_batch_ui.py")
@@ -107,3 +107,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
